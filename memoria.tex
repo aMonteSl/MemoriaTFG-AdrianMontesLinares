@@ -33,6 +33,31 @@
 \usepackage{pgfgantt}
 \usepackage{float} % para usar [H] en figures
 \usepackage{adjustbox} % para redimensionar diagramas si son muy anchos
+% Load hyperref last so TOC, refs and links become clickable
+\usepackage[hidelinks,unicode,pdfencoding=auto]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.multipart}
+\usepackage{enumitem} 
+% ...existing code...
+\usepackage{xurl}       % permite romper URLs/rutas largas en saltos de línea
+\usepackage{microtype}  % mejora espaciado y reduce underfull hbox
+% ...existing code...
+\usetikzlibrary{positioning}
+
+
+% Macro para mostrar rutas de ficheros y permitir quiebres
+\newcommand{\codepath}[1]{\path{#1}}
+% ...existing code...
+
+\hypersetup{
+  pdftitle={Code-XR — TFG},
+  pdfauthor={Adrián Montes Linares},
+  bookmarks=true,
+  pdfpagelabels=true,
+  plainpages=false
+}
+
+\raggedbottom
 
 
 % Escribe el título y el nombre del autor / autora para que se use bien
@@ -168,17 +193,18 @@ En resumen, Code‑XR no es solo una herramienta técnica. Es una nueva forma de
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Resumen en inglés
 
+
 \chapter*{Summary}
 %\addcontentsline{toc}{chapter}{Summary} % si queremos que aparezca en el índice
 \markboth{SUMMARY}{SUMMARY} % encabezado
 
-Code‑XR is a proposal designed to change the way developers analyze and understand their code in real time. It’s a plugin for Visual Studio Code that allows you to visualize advanced code metrics on the fly such as cyclomatic complexity, average number of parameters per function, total lines of code per file, and more.
+Code-XR is an idea proposed to change the way in which developers inspect and understand their program code in real time. It is a plugin for Visual Studio Code that allows you to view advanced code metrics on the fly such as cyclomatic complexity, average number of parameters per function, total number of lines per file, etc.
 
-What truly sets it apart is its integration with extended reality environments. Thanks to this, analyzing complex projects becomes more intuitive, immersive, and accessible even for those who aren't used to interpreting metrics at a glance.
+What makes Code-XR most distinctive is its ability to coexist with extended reality environments. Because of that, the interpretation of complex projects is simplified and becomes more intuitive and accessible for people who are not used to deciphering metrics at a glance.
 
-The core logic of the plugin is implemented in TypeScript, allowing advanced functionality to be integrated directly into Visual Studio Code and making full use of its API. For immersive visualization, Code‑XR leverages A-Frame, a framework specialized in building web-based virtual reality environments, and BabiaXR, a tool that enables analytical data to be represented as 3D graphics within the browser. Python is used to calculate code metrics, while HTML, CSS, and JavaScript are used for building the interface.
+The plugin's primary logic is developed in TypeScript so that advanced functionality is integrated directly into Visual Studio Code and the full power of its API is leveraged. For immersive visualizations, Code-XR uses A-Frame, an engine for authoring web-based virtual reality scenes, together with BabiaXR, a component for visualizing analytical data as 3D diagrams in the browser. Python computes the code metrics, while HTML, CSS and JavaScript are used to build the user interface.
 
-In short, Code‑XR is more than just a technical tool. It's a new way to connect with your code making it clearer, more visual, and ultimately, a more enriching experience.
+In short, Code-XR is not just another tool. It provides an alternative means to interact with your code easier to read, easier to visualize, and ultimately an enriched development experience.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -725,42 +751,314 @@ Estas herramientas no sustituyen el conocimiento técnico ni el razonamiento pro
 \chapter{Diseño e implementación}
 \label{sec:diseno}
 
-Aquí viene todo lo que has hecho tú (tecnológicamente). 
-Puedes entrar hasta el detalle. 
-Es la parte más importante de la memoria, porque describe lo que has hecho tú.
-Eso sí, normalmente aconsejo no poner código, sino diagramas.
+% Aquí viene todo lo que has hecho tú (tecnológicamente). 
+% Puedes entrar hasta el detalle. 
+% Es la parte más importante de la memoria, porque describe lo que has hecho tú.
+% Eso sí, normalmente aconsejo no poner código, sino diagramas.
 
+
+
+% \section{Arquitectura general} 
+% \label{sec:arquitectura}
+
+% Si tu proyecto es un software, siempre es bueno poner la arquitectura (que es cómo se estructura tu programa a ``vista de pájaro'').
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=9cm, keepaspectratio]{img/arquitectura.png}
+%   \caption{Estructura del parser básico}
+%   \label{fig:arquitectura}
+% \end{figure}
+
+
+% Por ejemplo, puedes verlo en la figura~\ref{fig:arquitectura}.
+% \LaTeX \ pone las figuras donde mejor cuadran. 
+% Y eso quiere decir que quizás no lo haga donde lo hemos puesto\ldots 
+% Eso no es malo.
+% A veces queda un poco raro, pero es la filosofía de \LaTeX: tú al contenido, que yo me encargo de la maquetación.
+
+
+ 
+% Recuerda que toda figura que añadas a tu memoria debe ser explicada.
+% Sí, aunque te parezca evidente lo que se ve en la figura~\ref{fig:arquitectura}, la figura en sí solamente es un apoyo a tu texto.
+% Así que explica lo que se ve en la figura, haciendo referencia a la misma tal y como ves aquí.
+% Por ejemplo: En la figura~\ref{fig:arquitectura} se puede ver que la estructura del \emph{parser} básico, que consta de seis componentes diferentes: los datos se obtienen de la red, y según el tipo de dato, se pasará a un \emph{parser} específico y bla, bla, bla\ldots
+
+% Si utilizas una base de datos, no te olvides de incluir también un diagrama de entidad-relación.
 
 
 \section{Arquitectura general} 
 \label{sec:arquitectura}
 
-Si tu proyecto es un software, siempre es bueno poner la arquitectura (que es cómo se estructura tu programa a ``vista de pájaro'').
+En esta sección se presenta la arquitectura general de Code‑XR, explicando sus componentes principales, los canales de comunicación entre ellos y las decisiones tecnológicas que sustentan su diseño. El objetivo es ofrecer una visión global suficiente para entender cómo fluye la información desde el código fuente hasta las visualizaciones en 2D (LivePanel) y XR.
 
-\begin{figure}
-  \centering
-  \includegraphics[width=9cm, keepaspectratio]{img/arquitectura.png}
-  \caption{Estructura del parser básico}
-  \label{fig:arquitectura}
+En los siguientes apartados de este capítulo se explicará cómo se desarrollaron las distintas partes del plugin, los pasos o sprints seguidos durante el desarrollo y cómo se estableció la comunicación entre los componentes, incluyendo detalles sobre protocolos, formatos de intercambio y la orquestación entre TypeScript, Python y las vistas cliente.
+
+
+\subsection{Componentes y responsabilidades}
+\begin{itemize}
+  \item \textbf{VS Code Extension (TypeScript):} registro de comandos, UI en el editor, gestión de procesos (lanzamiento de servidores HTTP/HTTPS, análisis con Python mediante entorno virtual, etc...), y almacenamiento de configuraciones. En conclusión, TypeScript es el lenguaje que maneja toda la lógica del plugin a través de la API oficial de Visual Studio Code~\cite{vscode-api}.
+  \item \textbf{Python metrics engine:} ejecución de scripts en Python para el análisis estático de ficheros y directorios. La mayor parte de las métricas se extraen usando la librería Lizard~\cite{lizard}, mientras que algunas métricas complementarias se calculan mediante código Python propio. El resultado se normaliza y se exporta en formato JSON para ser entendido por los componentes de BabiaXR~\cite{moreno2022babiaxr}.
+  \item \textbf{JSON Storage / Manager:} formato intermedio y almacenamiento temporal de resultados (ficheros .json o memoria). Este formato se utiliza tanto para las configuraciones del plugin —por ejemplo, parámetros a representar y el tipo de gráfico seleccionado— como para la salida de los análisis ejecutados por Python (las métricas se exportan en JSON). Las configuraciones persistentes del plugin se guardan usando la API de VS Code en globalState (ExtensionContext.globalState), de modo que se mantienen entre sesiones del editor; por su parte, los resultados de análisis y datos asociados al proyecto se almacenan en workspaceState (ExtensionContext.workspaceState), que queda ligado al workspace abierto y no se comparte entre workspaces. Para más detalles sobre ambos mecanismos de almacenamiento véase la documentación oficial de VS Code~\cite{vscode-storage}.
+  \item \textbf{Realtime API (SSE):} canal unidireccional basado en Server‑Sent Events (SSE) para enviar actualizaciones incrementales de métricas a los clientes (LivePanel, XR). En el cliente se implementa mediante la API nativa `EventSource` de JavaScript, y en el servidor mediante respuestas HTTP con content‑type \texttt{text/event-stream}~\cite{mdn-sse}. 
+
+  Aunque existen librerías como express-sse~\cite{express-sse} que facilitan la implementación de SSE en aplicaciones Node.js, se optó por una implementación nativa para mantener un control granular sobre los eventos enviados y reducir las dependencias externas del plugin. El sistema funciona de la siguiente manera: cuando un fichero observado cambia, la extensión detecta la modificación, lanza un re‑análisis (entorno virtual de Python), normaliza y actualiza el JSON correspondiente en workspaceState, y emite eventos SSE específicos como \texttt{analysis-updated} o \texttt{dataRefresh}. Los clientes suscritos (LivePanel, páginas XR) escuchan estos eventos mediante \texttt{EventSource('/events')}, reciben las notificaciones y actualizan automáticamente las visualizaciones sin recargar la página.
+  \item \textbf{Servidores de visualización (HTML/CSS/JS):} conjunto de plantillas web servidas por servidores locales HTTP/HTTPS para la visualización de métricas. Incluye dos modos principales:
+  \begin{itemize}
+    \item \textbf{LivePanel}: webview embebida en VS Code para visualización 2D con tablas, gráficos y métricas detalladas.
+    \item \textbf{XR Pages}: escenas 3D basadas en A-Frame y BabiaXR para visualización inmersiva en navegador o dispositivos VR.
+  \end{itemize}
+  Ambos modos comparten la misma infraestructura de servidor y comunicación SSE. Para el acceso desde dispositivos XR (como Meta Quest 3), el servidor debe configurarse en modo HTTPS con certificados autofirmados generados mediante OpenSSL~\cite{openssl}, ya que los navegadores en dispositivos VR requieren conexiones seguras para acceder a las APIs de WebXR.
+  \item \textbf{Sistema de plantillas dinámicas:} generador automático de plantillas HTML específicas para cada tipo de análisis y visualización. Incluye procesamiento de placeholders, validación de dimensiones de datos, y adaptadores para diferentes gráficos BabiaXR según el tipo de métricas extraídas.
+  \item \textbf{File watcher y detección de cambios:} monitorización automática de archivos para re-análisis en tiempo real. Utiliza la API de VS Code para detectar modificaciones en los ficheros bajo análisis y triggear actualizaciones automáticas del JSON y las vistas asociadas.
+  \item \textbf{Registry de servidores activos:} sistema de registro y gestión del ciclo de vida de servidores HTTP/HTTPS lanzados por el plugin. Permite controlar múltiples instancias simultáneas, gestionar puertos dinámicos y evitar conflictos entre diferentes análisis en ejecución.
+\end{itemize}
+
+
+% ...existing code...
+\subsection{Tipos de análisis}
+\label{sec:tipos-analisis}
+
+A continuación se presenta una tabla simplificada con los tipos fundamentales de análisis soportados por Code‑XR, su alcance y si admiten la opción \emph{deep} (recursión por subdirectorios) o la posibilidad de aplicarse al workspace completo (análisis de proyecto).
+
+\begin{figure}[H]
+\centering\small
+\begin{tabular}{p{5.0cm} p{7.5cm} p{2.5cm}}
+\hline
+\textbf{Tipo de análisis} & \textbf{Alcance} & \textbf{Deep? / Proyecto?} \\
+\hline
+Fichero — LivePanel & Análisis puntual de un único fichero; visualización 2D en el panel integrado. & No / No \\
+Fichero — XR & Análisis puntual de un único fichero; representación inmersiva en A‑Frame/BabiaXR. & No / No \\
+Directorio — LivePanel & Análisis de un directorio; resumen por archivo y agregados por carpeta. & Sí / Sí \\
+Directorio — XR & Representación 3D del contenido de un directorio (escena A‑Frame/BabiaXR). & Sí / Sí \\
+DOM Mode (especial) & Análisis de la estructura DOM de un fichero HTML; visualización 3D específica del DOM. & No / No \\
+\hline
+\end{tabular}
+\caption{Tipos fundamentales de análisis, alcance y soporte de \emph{deep}/\emph{proyecto}.}
+\label{tab:tipos-analisis}
 \end{figure}
 
+\bigskip
 
-Por ejemplo, puedes verlo en la figura~\ref{fig:arquitectura}.
-\LaTeX \ pone las figuras donde mejor cuadran. 
-Y eso quiere decir que quizás no lo haga donde lo hemos puesto\ldots 
-Eso no es malo.
-A veces queda un poco raro, pero es la filosofía de \LaTeX: tú al contenido, que yo me encargo de la maquetación.
+\noindent Para mayor claridad, a continuación se muestra la relación entre los comandos expuestos en la interfaz (menú contextual / editor) y el tipo de análisis que lanzan.
 
 
- 
-Recuerda que toda figura que añadas a tu memoria debe ser explicada.
-Sí, aunque te parezca evidente lo que se ve en la figura~\ref{fig:arquitectura}, la figura en sí solamente es un apoyo a tu texto.
-Así que explica lo que se ve en la figura, haciendo referencia a la misma tal y como ves aquí.
-Por ejemplo: En la figura~\ref{fig:arquitectura} se puede ver que la estructura del \emph{parser} básico, que consta de seis componentes diferentes: los datos se obtienen de la red, y según el tipo de dato, se pasará a un \emph{parser} específico y bla, bla, bla\ldots
+\begin{figure}[H]
+\centering\small
+\begin{tabular}{p{9.0cm} p{6.0cm}}
+\hline
+\textbf{Comando (UI)} & \textbf{Identificador interno / Tipo} \\
+\hline
+CodeXR: Analyze File (LivePanel) & \texttt{newCodeAnalysis.analyzeFile} — Fichero / LivePanel \\
+CodeXR: Analyze File (XR) & \texttt{newCodeAnalysis.analyzeFileXR} — Fichero / XR \\
+CodeXR: Analyze Directory (LivePanel) & \texttt{newCodeAnalysis.analyzeDirectory} — Directorio / LivePanel (No deep) \\
+CodeXR: Analyze Directory (LivePanel Deep) & \texttt{newCodeAnalysis.analyzeDirectoryDeep} — Directorio / LivePanel (Deep) \\
+CodeXR: Analyze Directory (XR) & \texttt{newCodeAnalysis.analyzeDirectoryXR} — Directorio / XR (No deep) \\
+CodeXR: Analyze Directory (XR Deep) & \texttt{newCodeAnalysis.analyzeDirectoryXRDeep} — Directorio / XR (Deep) \\
+CodeXR: Analyze Project (LivePanel) & \texttt{newCodeAnalysis.analyzeProject} — Proyecto / LivePanel (raíz del workspace) \\
+CodeXR: Analyze Project (LivePanel Deep) & \texttt{newCodeAnalysis.analyzeProjectDeep} — Proyecto / LivePanel (Deep, raíz del workspace) \\
+CodeXR: Analyze Project (XR) & \texttt{newCodeAnalysis.analyzeProjectXR} — Proyecto / XR (raíz del workspace) \\
+CodeXR: Analyze Project (XR Deep) & \texttt{newCodeAnalysis.analyzeProjectXRDeep} — Proyecto / XR (Deep, raíz del workspace) \\
+CodeXR: Visualize DOM & \texttt{newCodeAnalysis.visualizeDOM} — DOM Mode \\
+\hline
+\end{tabular}
+\caption{Mapeo entre comandos de la UI y tipos de análisis (incluye variantes de proyecto).}
+\label{tab:comandos-analisis}
+\end{figure}
 
-Si utilizas una base de datos, no te olvides de incluir también un diagrama de entidad-relación.
+\bigskip
 
 
+Notas:
+\begin{itemize}
+  \item Los comandos de ``Proyecto'' operan reutilizando la misma lógica interna que los comandos de ``Directorio''; la única diferencia es que, al invocarse, toman la raíz del workspace como directorio a analizar.
+  \item La forma de invocar estos comandos desde la interfaz es mediante el menú contextual (click derecho) en el explorador de archivos o en el editor. La asignación de entradas de menú, reglas de visibilidad y los identificadores de comando están declarados en el fichero \texttt{package.json} del plugin; en un apartado posterior se detalla la estructura y funcionamiento de \texttt{package.json} en extensiones de VS Code. Otra forma también de invocarlos es a través de un acceso rápido integrado en la interfaz del plugin, que permite seleccionar ficheros y directorios mediante las vistas ``Files by Language'' y ``Project Structure''. Esto se explicará con más detalle en la sección dedicada a la interfaz del plugin.
+  \item ``Deep'' indica análisis recursivo sobre subdirectorios; su uso incrementa la cantidad de datos y las entidades en la escena XR, por lo que puede requerir optimizaciones de rendimiento (batching, análisis incremental, reducción de nivel de detalle).
+\end{itemize}
+
+
+\section{Flujo de datos / Secuencia de ejecución}
+\label{sec:flujo-ejecucion}
+
+
+A continuación se explica, de forma general y sin referencias a rutas concretas, la secuencia básica que sigue un análisis en Code‑XR desde la petición del usuario hasta la actualización de la visualización. Esta descripción está pensada para ofrecer una visión global del flujo de trabajo.
+
+\begin{enumerate}
+  \item \textbf{Petición del análisis.} El usuario solicita un análisis mediante la interfaz gráfica (clic derecho), a través del menú rápido del plugin (\emph{Files by Language} o \emph{Project Structure}) o ejecutando el comando desde la paleta de comandos (F1). La petición especifica el tipo de análisis deseado y el objetivo (ruta al fichero o al directorio a analizar).
+  \item \textbf{Registro de la sesión de análisis.} Se crea una sesión de análisis con un identificador único (nonce) y se registran los datos necesarios para ejecutar y rastrear el análisis: la ruta de almacenamiento en el directorio \texttt{workspaceStorage} (ver \cite{vscode-storage}), la lista de ficheros involucrados, el tipo de análisis, el estado actual de la sesión y los parámetros de configuración. Tras crear la sesión, el flujo continúa con la obtención de los ficheros necesarios para el análisis.
+  \item \textbf{Obtención de los ficheros necesarios.} Según el tipo de análisis, el motor determina los ficheros y parámetros necesarios para ejecutar y presentar el resultado: las plantillas HTML/CSS/JS que se usarán en la vista, y los argumentos con los que ejecutar el script principal \texttt{main.py} que realizará el análisis para generar el fichero \texttt{data.json} con las métricas. En la práctica se prepara un paquete compuesto por la plantilla HTML, los recursos CSS/JS y el fichero de datos; adicionalmente se copia un \texttt{favicon.ico} para la interfaz (no relevante para la lógica del análisis). Todos estos ficheros se guardan en la ruta de almacenamiento creada para la sesión dentro del directorio \texttt{workspaceStorage}. El parseado de la plantilla HTML cambia según el tipo de análisis solicitado (p. ej. LivePanel vs XR); el detalle del parseado se describe en la sección dedicada a explicar cómo funciona el análisis de Code‑XR.
+  \item \textbf{Persistencia temporal de la sesión.} Una vez generado el paquete con todos los datos necesarios, éstos se guardan en la ruta indicada para la sesión. Esta persistencia facilita el re\-análisis y el arranque del servidor de visualización. Los ficheros resultantes de los análisis realizados durante la sesión se eliminan de \texttt{workspaceStorage} al cerrar VS Code, evitando así dejar \emph{analysis zombies} que ocupen espacio innecesario.
+  \item \textbf{Activación de watchers con debounce.} Se registran observadores (watchers) sobre los ficheros implicados para detectar cambios. Los watchers aplican un \emph{debounce time}: un intervalo configurable que sirve para agrupar eventos de cambio que ocurren en rápida sucesión (por ejemplo, mientras un desarrollador escribe). En ausencia de debounce, cada modificación podría disparar un nuevo análisis y generar sobrecarga; con debounce, el sistema espera hasta que no se producen más cambios durante el intervalo configurado y entonces ejecuta el análisis, evitando re\-análisis innecesarios. Si el usuario cambia dinámicamente el valor del \emph{debounce time} durante una sesión, los watchers se reconfiguran para emplear el nuevo intervalo inmediatamente, afectando a las detecciones posteriores.
+  \item \textbf{Lanzamiento del servidor de visualización y canal SSE.} Se inicia un servidor local que sirve los ficheros HTML/CSS/JS preparados para la sesión como `localhost` (o `https://localhost` si el usuario tiene configurado HTTPS). La forma concreta de arrancar el servidor (puerto, HTTP/HTTPS, certificados, etc...) depende de la configuración del usuario; en cualquier caso el servidor expone además un canal de eventos en tiempo real mediante Server‑Sent Events (SSE) que se utiliza para notificar a las vistas cuando hay resultados nuevos tras un re‑análisis.
+  \item \textbf{Detección de cambios y re‑análisis incremental.} Cuando un watcher detecta un cambio en un fichero, se siguen estos pasos:
+    \begin{enumerate}[label=\alph*), nosep, topsep=0pt, partopsep=0pt, parsep=0pt, itemsep=0.5ex, leftmargin=2em]
+      \item Identificar la sesión de análisis asociada al fichero modificado.
+      \item Re‑analizar únicamente los ficheros afectados (análisis incremental) y actualizar el JSON/metadata de la sesión.
+      \item Persistir los resultados en la ruta de la sesión para que el servidor los sirva inmediatamente.
+      \item Emitir un evento por el canal SSE (\texttt{analysis-updated}); las vistas suscritas reciben la notificación y actualizan la visualización en tiempo real.
+    \end{enumerate}
+\end{enumerate}
+
+% Diagrama vertical en TikZ
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=8mm,
+  procstep/.style={rectangle, draw=black, rounded corners, fill=gray!10, text width=10.5cm, align=center, minimum height=10mm},
+  arr/.style={-{Stealth}, thick}
+]
+\node[procstep] (p1) {1. Petición del análisis};
+\node[procstep, below=of p1] (p2) {2. Registro de la sesión};
+\node[procstep, below=of p2] (p3) {3. Obtención de ficheros};
+\node[procstep, below=of p3] (p4) {4. Persistencia temporal};
+\node[procstep, below=of p4] (p5) {5. Watchers (debounce)};
+\node[procstep, below=of p5] (p6) {6. Servidor + SSE};
+\node[procstep, below=of p6] (p7) {7. Detección y re‑análisis};
+\draw[arr] (p1) -- (p2);
+\draw[arr] (p2) -- (p3);
+\draw[arr] (p3) -- (p4);
+\draw[arr] (p4) -- (p5);
+\draw[arr] (p5) -- (p6);
+\draw[arr] (p6) -- (p7);
+\end{tikzpicture}
+\caption{Secuencia vertical simplificada del flujo de un análisis.}
+\label{fig:flujo-vertical}
+\end{figure}
+
+\noindent En el siguiente diagrama se ofrece una visión abstracta y lineal del proceso. En la práctica, varias sesiones pueden coexistir, teniendo para un fichero mas de un watcher activo (p. ej. un análisis de directorio y otro de proyecto que incluyan el mismo fichero). El sistema gestiona estas situaciones mediante el registro de sesiones y watchers, asegurando que cada cambio se propaga correctamente a todas las vistas afectadas.
+
+% Explicacion de la evolucion del proyecto
+% ...existing code...
+\section{Resumen cronológico de versiones}
+\label{sec:resumen-versiones}
+A continuación se presenta un resumen cronológico compacto de las versiones principales del plugin (desde la 0.0.1 hasta la 1.0.0). La tabla está ordenada empezando por la versión inicial (0.0.1) y finalizando en la versión estable (1.0.0). En la subsección siguiente se describirán con más detalle los sprints/hitos relacionados con estas versiones.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{p{2.2cm} p{2.8cm} p{9.0cm}}
+\hline
+\textbf{Versión} & \textbf{Fecha (aprox.)} & \textbf{Resumen / hito principal} \\
+\hline
+0.0.1 & 2025-03-11 & Primer prototipo: servidor HTTP que servía un HTML A‑Frame predefinido (prueba de concepto XR) y comandos básicos para lanzar la visualización. \\
+0.0.2 & 2025-03-20 & Primer análisis básico en modo LivePanel para ficheros JavaScript/TypeScript; ya se comenzó a controlar la infraestructura XR (selección del HTML a servir y primeras comprobaciones de HTTPS), pero las visualizaciones principales seguían siendo 2D (LivePanel). \\
+0.0.3 & 2025-04-11 & Introducción de auto‑reanalysis, selección inteligente de ejes, integración SSE, watchers por fichero y primer soporte de análisis estático (LOC, CCN, funciones). \\
+0.0.4 & 2025-04-27 & Soporte multi‑lenguaje ampliado y sistema configurable de debounce para auto‑análisis; mejoras en XR y análisis múltiple simultáneo. \\
+0.0.5 & 2025-04-29 & Nuevas visualizaciones (babia‑boats), mapeo de parámetros a dimensiones visuales y mejoras en plantillas y resolución de rutas. \\
+0.0.6 & 2025-04-29 & Publicación inicial en marketplace: estabilización de servidores, UX y preparación para distribución pública. \\
+0.0.7 & 2025-06-01 & Mejora del live reload y experiencia XR: SSE robusto, controles VR/AR mejorados y configuración avanzada de entornos. \\
+0.0.8 & 2025-07-03 & Revisión mayor del motor de análisis: soporte Lizard ampliado, Visualize DOM, nuevas visualizaciones (bubble chart) y optimizaciones de watcher/caché. \\
+0.0.9 & 2025-07-27 & Re‑arquitecturación del motor de análisis: análisis de directorios completos, soporte deep y mejoras de rendimiento/fiabilidad. \\
+1.0.0 & 2025-07-28 & Versión estable: sistema de auto-análisis configurable, gestión avanzada de sesiones con prevención de duplicados, filtrado inteligente de ficheros HTML, optimización de configuración y watchers, y publicación de la web oficial de documentación (https://amontesl.github.io/code-xr-docs/). \\
+\hline
+\end{tabular}
+\caption{Resumen cronológico de versiones — hitos principales (orden: 0.0.1 → 1.0.0).}
+\label{tab:changelog}
+\end{table}
+
+
+\noindent Nota: los detalles en esta tabla se han extraído y condensado desde el fichero \texttt{CHANGELOG.md}. Hay registros públicos en \texttt{CHANGELOG.md} a partir de la versión 0.0.3; el plugin estuvo publicado en el marketplace desde la versión 0.0.6. Las fechas aproximadas indican momentos representativos del desarrollo y se usan para situar cronológicamente los hitos.
+
+
+% Diagrama temporal simplificado de la evolución de versiones
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/versions_gantt.png}
+  \caption{Evolución temporal resumida de las versiones principales del proyecto.}
+  \label{fig:timeline-versions}
+\end{figure}
+% ...existing
+
+
+\noindent En los siguientes subapartados se describirán los sprints/hitos que explican cómo se pasó de la idea inicial a la versión 1.0.0, detallando para cada sprint el objetivo, las tareas realizadas y los artefactos resultantes.
+
+
+
+\section{Primeros pasos}
+\label{sec:primeros-pasos}
+
+Esta sección recoge los conceptos básicos y decisiones iniciales adquiridos durante la creación de la extensión para VS Code. El propio editor ofrece un tutorial introductorio para desarrollar una primera extensión\cite{tutorialVSCode}, el cual se siguió en paralelo con recursos en vídeo, como el tutorial oficial de VS Code en YouTube\cite{vscode-youtube}. A partir de estos materiales, y utilizando el generador oficial de extensiones (``Yo Code'')\cite{yo-code}, se establecieron las bases del proyecto y se tomaron las primeras decisiones técnicas que marcaron su desarrollo inicial.
+
+\subsection{Generador \emph{Yo Code}}
+El generador oficial de extensiones para VS Code, denominado ``Yo Code'', guía al desarrollador mediante una serie de preguntas que definen la plantilla inicial del plugin: identificador y nombre de la extensión, descripción, publicador, lenguaje de desarrollo (TypeScript o JavaScript), inicialización opcional de un repositorio Git, gestor de paquetes y el tipo de empaquetado (opciones típicas: \emph{unbundled}, Webpack, Esbuild). Estas decisiones iniciales configuran la estructura base del proyecto y los scripts para compilar, empaquetar y desplegar la extensión.
+
+\subsection{Elección de lenguaje}
+Se optó por \textbf{TypeScript}, dado que ofrece tipado estático que reduce errores, integración directa con las definiciones de la API de VS Code y mayor mantenibilidad en proyectos de mediana y gran escala\cite{typescript}. Este lenguaje permitió a Code-XR evolucionar de forma segura al crecer en número de ficheros y complejidad.
+
+\subsection{Bundlers}
+El proceso de empaquetado de una extensión de VS Code puede realizarse de distintas formas, dependiendo del flujo de desarrollo y de los requisitos de distribución. La documentación oficial recomienda evaluar diferentes bundlers según las necesidades del proyecto\cite{vscode-bundling}.  
+Entre las opciones más habituales se incluyen:
+\begin{itemize}
+  \item \textbf{Unbundled}: sin bundler, útil para prototipado rápido pero obliga a distribuir dependencias manualmente.
+  \item \textbf{Webpack}: bundler clásico y ampliamente usado; genera un único paquete y minimiza dependencias externas\cite{webpack}.
+  \item \textbf{Esbuild}: bundler moderno, extremadamente rápido y con tiempos de compilación reducidos\cite{esbuild}.
+\end{itemize}
+
+En Code-XR se comenzó con la plantilla \emph{unbundled} para acelerar el prototipado y validar la integración con A-Frame y BabiaXR. Posteriormente se migró a un flujo con \textbf{Webpack}, que sigue siendo el bundler activo en la actualidad. El cambio no solo aportó mayor fiabilidad en la distribución, sino que también resolvió limitaciones prácticas: en versiones recientes, el empaquetado a formato \texttt{.vsix} generaba advertencias de \texttt{npm} por tamaño excesivo. Con Webpack, dichas advertencias desaparecieron y los tiempos de compilación se redujeron de forma notable.
+
+\subsection{Archivo \texttt{package.json} (manifiesto de la extensión)}
+El fichero \texttt{package.json} es el manifiesto central de toda extensión de VS Code. Contiene los metadatos que identifican la extensión en el Marketplace (nombre, versión, publicador, categorías, icono y repositorio), además de la compatibilidad con el motor de VS Code y la lista de ficheros incluidos en la distribución.  
+
+También controla el proceso de compilación y empaquetado mediante la sección \texttt{scripts}, que en Code-XR se apoya en Webpack para generar un bundle reproducible siguiendo las recomendaciones oficiales\cite{vscode-bundling}.  
+
+Otra sección clave es \texttt{contributes}, donde se definen los elementos que la extensión añade a la interfaz: más de 40 comandos, la vista lateral \texttt{codexrTree}, y menús contextuales en el explorador, el editor y las vistas de elementos. Esta configuración conecta la extensión con el usuario final y organiza la navegación.  
+
+En cuanto a \texttt{activationEvents}, Code-XR declara una lista vacía, lo que implica activación ansiosa al abrir VS Code. Aunque lo recomendable es activar bajo demanda (\texttt{onCommand}, \texttt{onView}, \texttt{onLanguage}), esta decisión garantizó que todos los menús y vistas estuviesen disponibles desde el inicio.  
+
+Finalmente, la \textbf{iconografía} de la extensión se construyó principalmente con \emph{Codicons}, la librería oficial de VS Code\cite{codicons}. Se emplearon iconos de \emph{Devicon}\cite{devicon} para representar ficheros en vistas como \emph{Files per Language} y \emph{Project Structure}, mientras que el logotipo de Code-XR se generó de manera personalizada mediante técnicas de inteligencia artificial.
+
+\subsection{Archivo \texttt{extension.ts}}
+El archivo \texttt{extension.ts} implementa la lógica declarada en el manifiesto. Es el punto de entrada de la extensión y define dos funciones fundamentales:  
+\begin{itemize}
+  \item \texttt{activate}: se ejecuta al activar la extensión y orquesta la inicialización de servicios (gestión de servidores, restauración de configuraciones, limpieza automática de análisis obsoletos), el registro de la vista modular (\texttt{codexrTree}), la asociación de comandos y la sincronización del estado de visualización de datos.  
+  \item \texttt{deactivate}: se invoca al desactivar la extensión y garantiza la liberación ordenada de recursos, como servidores activos, gestores SSE, mapeos de ficheros y vistas modulares.  
+\end{itemize}
+
+En Code-XR, este fichero asegura que la extensión arranque en un estado limpio y predecible, y que al cerrarse no queden procesos en segundo plano ni recursos bloqueados.
+
+\subsection{Registro de comandos e interfaz de usuario}
+El registro de comandos es el mecanismo que conecta las acciones del usuario con la lógica implementada en la extensión. Cada comando se declara en \texttt{package.json} y se enlaza en \texttt{extension.ts} mediante su \emph{handler}. En Code-XR, los comandos abarcan desde el análisis de ficheros y directorios hasta la gestión de servidores y ejemplos de BabiaXR.  
+
+La interfaz de usuario se apoya en primitivas de la API de VS Code como:
+\begin{itemize}
+  \item \textbf{TreeView / TreeDataProvider}: para organizar servidores, ejemplos y análisis activos en la vista lateral.
+  \item \textbf{WebviewPanel} y \textbf{WebviewView}: para mostrar visualizaciones interactivas en 2D (LivePanel) o XR.
+  \item \textbf{StatusBarItem} y elementos contextuales: para notificaciones rápidas y accesos directos.
+\end{itemize}
+
+Estas primitivas permitieron a Code-XR ofrecer una experiencia integrada en el flujo habitual del editor, combinando menús, paneles y vistas enriquecidas en una misma extensión.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{img/fig-extension-structure.png}
+\caption{Relación entre los componentes clave de una extensión VS Code en Code-XR.}
+\label{fig:extension-structure}
+\end{figure}
+
+% SECCION DE SPRINTS
+
+\section{Sprint 1 — Lanzamiento de servidores locales}
+\label{sec:sprint-servers}
+
+Introducción. Este fue el primer objetivo planteado para poner en marcha Code-XR: dotar a la extensión de la capacidad de lanzar servidores locales en \emph{localhost}, permitiendo que los recursos de la extensión pudieran servirse de manera accesible desde un navegador o desde la propia interfaz del editor. La idea se inspiraba en el funcionamiento de otras extensiones consolidadas como \emph{Live Server}\cite{liveserver}, que facilitan un flujo de trabajo más ágil al eliminar la necesidad de configurar manualmente un servidor externo.  
+
+\subsection{Primeras versiones — lanzamiento de servidores}
+En las primeras versiones el servidor era mínimamente funcional: servía un HTML fijo con una escena A‑Frame de ejemplo (prueba de concepto) y ofrecía comandos básicos para arrancar y parar la visualización desde la paleta de comandos. Posteriormente se fueron incorporando capacidades incrementales:
+
+\begin{itemize}
+  \item selección del fichero HTML a servir en lugar de usar una plantilla fija;
+  \item Control de múltiples servidores y gestión automática de puertos: la extensión incorporó la librería \texttt{get-port}\cite{get-port}, que permite detectar de forma dinámica puertos disponibles en el sistema. De este modo se evitaba la colisión con puertos ya ocupados y se garantizaba que cada servidor local pudiera lanzarse sin interferencias. Además, este mecanismo facilitó la reutilización de puertos en sesiones posteriores cuando resultaba apropiado, proporcionando una experiencia más fluida y predecible para el usuario.
+  \item Soporte HTTPS: se añadió la posibilidad de lanzar los servidores en modo seguro utilizando certificados por defecto incluidos en la extensión el par \texttt{cert}/\texttt{key} ubicado en la carpeta interna \texttt{certs} preparados con \texttt{OpenSSL}\cite{openssl}. Como alternativa, el usuario puede seleccionar sus propios certificados autofirmados mediante el explorador de ficheros, indicando las rutas de \texttt{cert} y \texttt{key}. Esta doble modalidad (certificados internos frente a certificados personalizados) aporta flexibilidad y facilita la adopción de HTTPS en distintos entornos sin complicar el flujo de lanzamiento.
+\end{itemize}
+
+Llegados a este punto de mínima funcionalidad, con la capacidad de servir los servidores en modo HTTPS, se pudo dar por concluido el primer hito y avanzar hacia las siguientes etapas del desarrollo. No obstante, antes de continuar, en la próxima subsección se detalla el estado actual del sistema de lanzamiento de servidores, tanto en lo referente a la interfaz de usuario como a su funcionamiento interno dentro del plugin.
+
+\subsection{Versión actual — lanzamiento de servidores (TO DO)}
+TO DO: insertar aquí una captura de pantalla del UI de lanzamiento de servidores y detallar las opciones disponibles (HTTP/HTTPS, rutas de certificados, control de puerto, apertura en panel VS Code vs. navegador externo, opciones de apertura automática, registro de instancias en el \emph{registry}, etc.).  
+
+En esta subsección se explicará cómo se exponen estas opciones en la interfaz, qué parámetros se persisten por sesión y cómo se integra el flujo de servidores con el sistema de sesiones y con el canal SSE para actualizaciones en tiempo real. La descripción técnica completa de la implementación (módulos TypeScript, API interna para arranque/parada, gestión de certificados y políticas de puerto) se incluirá en el apartado de implementación detallada de este sprint.
+
+
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EXPERIMENTOS Y VALIDACIÓN %
