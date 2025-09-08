@@ -1205,6 +1205,295 @@ El \texttt{NetworkUtils} detecta automáticamente la IP local y genera URLs de a
 \paragraph{Síntesis técnica}
 El subsistema combina \textbf{arquitectura modular escalable}, \textbf{configuración persistente con validación}, \textbf{multi-servidor concurrente robusto}, \textbf{gestión inteligente de puertos}, \textbf{HTTPS} y \textbf{registro centralizado con observabilidad}. La integración completa con VS Code (TreeView, comandos, paneles) y el canal SSE bidireccional posicionan este módulo como la columna vertebral técnica de Code-XR, proporcionando una base sólida para el ecosistema de visualización XR.
 
+%----------------------------------------------------------------
+% Sprint 2 - BabiaXR
+%----------------------------------------------------------------
+
+\section{Sprint 2 — Integración con BabiaXR y ejemplos de visualización}
+\label{sec:sprint-babiaxr}
+
+El segundo sprint marcó la transición de Code-XR desde un sistema capaz de lanzar servidores locales hacia una extensión con funcionalidades de visualización XR completas y operativas. Para alcanzar el objetivo principal del plugin mostrar análisis de ficheros y directorios en formato XR inmersivo era fundamental primero comprender y dominar la librería \textbf{BabiaXR}, que constituye el motor de visualización 3D sobre el que se construyen todas las representaciones WebXR/AR/VR de Code-XR.
+
+El desarrollo siguió una progresión lógica y pedagógica dividida en tres fases consecutivas, cada una construyendo sobre los conocimientos y capacidades establecidas en la anterior:
+
+\paragraph{Fase 1: Comprensión de BabiaXR mediante ejemplos}
+La primera aproximación consistió en crear una galería de ejemplos predefinidos que permitiera explorar y entender las capacidades fundamentales de BabiaXR. Este enfoque facilitó la familiarización con los diferentes tipos de gráficos disponibles (barras, sectores, burbujas, cilindros, etc.), sus parámetros de configuración, las estructuras de datos requeridas y las mejores prácticas para integrar A-Frame con componentes BabiaXR en el contexto de una extensión VS Code.
+
+\paragraph{Fase 2: Conexión de datos JSON con visualizaciones}
+Una vez establecida una base sólida de comprensión sobre BabiaXR, el siguiente paso natural fue desarrollar la capacidad de transformar datos arbitrarios en formato JSON en visualizaciones interactivas. Esta fase requirió diseñar e implementar un pipeline completo de procesamiento que abarcara desde el análisis automático de estructuras de datos hasta la generación dinámica de plantillas HTML/A-Frame, pasando por el mapeo inteligente de campos de datos a dimensiones visuales específicas de cada tipo de gráfico.
+
+\paragraph{Fase 3: Personalización y control visual}
+La fase final se centró en proporcionar al usuario control granular sobre los aspectos estéticos y ambientales de las visualizaciones generadas. Esto incluyó la implementación de un sistema de configuración que permitiera seleccionar ambientes 3D (bosques, paisajes futuristas, entornos abstractos), personalizar colores de fondo y suelo, y elegir paletas cromáticas optimizadas para diferentes tipos de datos y contextos de visualización.
+
+Esta aproximación incremental no solo facilitó el desarrollo técnico, sino que también estableció una base arquitectónica sólida y extensible para futuras mejoras del sistema de visualización XR.
+
+\paragraph{Módulos resultantes}
+El sprint produjo tres subsistemas especializados e interconectados:
+\begin{enumerate}
+  \item \textbf{Babia Examples}: galería interactiva de ejemplos predefinidos BabiaXR que sirve como plataforma de aprendizaje y punto de partida para nuevas visualizaciones.
+  \item \textbf{Visualize Data}: pipeline sofisticado de transformación que convierte datos JSON arbitrarios en visualizaciones XR mediante flujo guiado, análisis automático de campos y mapeo inteligente de dimensiones.
+  \item \textbf{Visualization Settings}: sistema de configuración visual que permite personalizar ambientes 3D, esquemas de color, paletas de gráficos y otros parámetros estéticos aplicados globalmente a todas las visualizaciones.
+\end{enumerate}
+
+Cada módulo se implementó como un subsistema independiente con arquitectura modular, pero todos comparten la infraestructura de servidores y UI establecida en el sprint anterior, garantizando consistencia en el comportamiento, configuración y experiencia de usuario. A continuación, se describen en detalle.
+
+%---------------------------
+% Babia Examples
+%---------------------------
+
+\subsection{Babia Examples}
+\label{sec:babia-examples}
+
+El subsistema \emph{Babia Examples} proporciona una solución integrada de descubrimiento, gestión y lanzamiento de ejemplos predefinidos BabiaXR dentro del entorno VS Code, actuando como galería interactiva y plataforma de aprendizaje para desarrolladores. Este módulo facilita el acceso inmediato a visualizaciones WebXR/AR/VR completamente funcionales mediante un flujo de un solo clic, permitiendo a los usuarios explorar las capacidades de BabiaXR, experimentar con diferentes tipos de gráficos y utilizar los ejemplos como plantillas de referencia para sus propios proyectos.
+
+El sistema se integra de manera transparente con la infraestructura de servidores establecida, heredando automáticamente las configuraciones de usuario (HTTP/HTTPS, selección de puertos, comportamiento de apertura automática) y registrando cada ejemplo lanzado en el sistema de \emph{Active Servers} para un control de ciclo de vida consistente y centralizado.
+
+\paragraph{Arquitectura modular y descubrimiento dinámico}
+La implementación adopta una arquitectura de componentes especializados bajo \texttt{src/babia\_examples/}, organizando la funcionalidad en capas diferenciadas: modelos de datos (\texttt{model/}), lógica de ejecución (\texttt{runtime/}), integración de vistas (\texttt{views/}) y registro de comandos (\texttt{commands/}). Esta separación modular facilita el mantenimiento, permite la extensión futura del catálogo de ejemplos y proporciona puntos de integración claros para funcionalidades adicionales.
+
+El núcleo del sistema es el \texttt{ExampleLauncher}, que implementa un mecanismo de descubrimiento dinámico que escanea recursivamente el directorio \texttt{examples/charts/}, identifica automáticamente archivos HTML válidos, genera metadatos descriptivos y mantiene un sistema de caché inteligente con validación temporal de 30 segundos para optimizar el rendimiento sin sacrificar la precisión.
+
+\paragraph{Catálogo comprehensivo de visualizaciones}
+La colección de ejemplos abarca un espectro amplio de técnicas de visualización de datos, cada una diseñada para demostrar diferentes aspectos y capacidades de BabiaXR:
+
+\begin{itemize}
+  \item \textbf{Bar Chart}: visualización fundamental de barras tridimensionales con datos categóricos, ideal para comparaciones directas y análisis de distribuciones
+  \item \textbf{Barsmap}: representación espacial de barras distribuidas sobre superficies, combinando información geográfica con métricas cuantitativas
+  \item \textbf{Bubble Chart}: diagramas de dispersión tridimensionales donde el tamaño de las burbujas representa una tercera dimensión de datos
+  \item \textbf{Cylinder Chart}: visualizaciones cilíndricas 3D que aprovechan la profundidad para representar jerarquías y relaciones de datos
+  \item \textbf{Cylindermap Chart}: combinación de representación cilíndrica con distribución espacial para datasets complejos multidimensionales
+  \item \textbf{Pie}: gráficos circulares clásicos con múltiples variantes de datos (\texttt{index.html}, \texttt{population.html}) que demuestran flexibilidad de datasets
+  \item \textbf{Mix}: escenario híbrido sofisticado que combina cuatro tipos de gráficos diferentes en una sola escena, demostrando capacidades de composición avanzadas
+\end{itemize}
+
+Cada ejemplo incorpora las dependencias estándar de BabiaXR (A-Frame 1.0.4, aframe-babia-components, aframe-environment-component, aframe-extras) y está optimizado para compatibilidad WebXR, incluyendo controles de movimiento, posicionamiento de cámara y configuraciones de iluminación apropiadas.
+
+\paragraph{Sistema de validación y selección inteligente de archivos}
+El proceso de descubrimiento implementa lógica de selección inteligente que prioriza \texttt{index.html} cuando está disponible, pero recurre al primer archivo HTML disponible alfabéticamente en caso de ausencia del archivo principal. Esta flexibilidad permite estructuras de ejemplo variadas mientras mantiene consistencia en la experiencia de usuario.
+
+El sistema de validación opera en múltiples niveles: verificación de existencia de directorios, detección de archivos HTML, validación de accesibilidad de archivos y generación de metadatos descriptivos. Los ejemplos inválidos (directorios sin archivos HTML válidos) se manejan graciosamente, mostrando estados de error informativos sin interrumpir la funcionalidad general del sistema.
+
+\paragraph{Integración ecosistémica y delegación de responsabilidades}
+La arquitectura del subsistema sigue principios de delegación inteligente, aprovechando completamente la infraestructura de servidores existente sin duplicar funcionalidad. El lanzamiento de ejemplos se delega al \texttt{MultiServerLauncher}, garantizando comportamiento consistente en selección de puertos, gestión de certificados SSL, resolución de conflictos de red y registro automático en \emph{Active Servers}.
+
+Esta integración transparente significa que los ejemplos aparecen en el registro de servidores activos con nombres descriptivos personalizados (p.\,ej., ``Bar Chart Example''), heredan todas las preferencias de configuración del usuario y se benefician del mismo conjunto de acciones contextuales disponibles para otros tipos de servidores (abrir en navegador, copiar URL, detener servidor, etc.).
+
+\paragraph{Experiencia de usuario y gestión de estados}
+La interfaz de usuario implementa indicadores de estado dinámicos que proporcionan retroalimentación visual inmediata durante las operaciones de descubrimiento y lanzamiento. El sistema muestra estados de carga durante el escaneo de ejemplos, maneja graciosamente situaciones de error (directorios vacíos, archivos corruptos, fallos de servidor) y proporciona opciones de recuperación mediante funcionalidad de refresco manual.
+
+El \texttt{BabiaExamplesTreeDataProvider} integra el patrón \texttt{TreeDataProvider} de VS Code para proporcionar una experiencia nativa dentro del editor, con soporte para actualización automática basada en eventos, ordenación inteligente por categoría y nombre, y manejo robusto de estados de carga y error.
+
+\paragraph{Estructura de datos y ecosistema de archivos}
+El directorio \texttt{examples/} implementa una organización dual que separa claramente los recursos de visualización de los datos de prueba:
+
+\begin{itemize}
+  \item \texttt{charts/}: estructura de directorios categórica donde cada subdirectorio contiene un ejemplo completo con su archivo HTML principal y recursos asociados
+  \item \texttt{data/}: repositorio centralizado de datasets de prueba (\texttt{gdp.json}, \texttt{population.json}, \texttt{sales.json}, \texttt{simple\_sales.json}, \texttt{temperatures.json}, \texttt{test\_functions.json}) que proporcionan datos realistas y variados para demostraciones
+\end{itemize}
+
+Esta separación facilita la reutilización de datasets entre múltiples ejemplos, simplifica el mantenimiento de los datos de prueba y proporciona una estructura escalable para la adición de nuevos ejemplos y datasets.
+
+\paragraph{Optimización de rendimiento y estrategias de caché}
+El sistema implementa un mecanismo de caché inteligente que equilibra la frescura de los datos con el rendimiento operacional. El caché de 30 segundos para resultados de escaneo evita operaciones redundantes del sistema de archivos durante interacciones frecuentes de la UI, mientras que la invalidación automática garantiza que los cambios en el directorio de ejemplos se reflejen apropiadamente.
+
+La lógica de caché opera a nivel de operación de escaneo completo en lugar de cachés granulares por archivo, simplificando la gestión de invalidación y proporcionando un modelo de consistencia robusto que funciona eficazmente en entornos de desarrollo donde los ejemplos pueden modificarse frecuentemente.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\linewidth]{img/ui-babia-examples.png}
+\caption{Vista del apartado \emph{Babia Examples} mostrando la galería de ejemplos BabiaXR disponibles, cada uno lanzable con un clic y con integración completa en el ecosistema de servidores de Code-XR.}
+\label{fig:ui-babia-examples}
+\end{figure}
+
+En síntesis, \emph{Babia Examples} representa una implementación madura de galería interactiva que combina descubrimiento automático, validación robusta, integración ecosistémica transparente y experiencia de usuario optimizada, proporcionando a los desarrolladores una plataforma efectiva para explorar, aprender y experimentar con las capacidades de visualización XR de BabiaXR dentro del flujo de trabajo familiar de VS Code.
+
+%---------------------------
+% Visualize Data
+%---------------------------
+
+\subsection{Visualize Data — del JSON a una visualización XR}
+\label{sec:visualize-data}
+
+El subsistema \emph{Visualize Data} constituye el núcleo de transformación de datos de Code-XR, proporcionando un pipeline sofisticado que convierte ficheros \texttt{JSON} arbitrarios en visualizaciones inmersivas BabiaXR a través de un flujo de trabajo guiado e intuitivo. Este módulo actúa como el puente principal entre datos en bruto y experiencias WebXR/AR/VR, implementando análisis automático de campos, mapeo inteligente de dimensiones, validación exhaustiva y generación de plantillas HTML completas.
+
+El sistema se estructura en un flujo progresivo de cuatro etapas que guían al usuario desde la selección inicial del tipo de gráfico hasta el lanzamiento de un servidor local con la visualización completamente funcional, integrándose de manera transparente con la infraestructura de servidores establecida y heredando automáticamente las preferencias estéticas definidas en \emph{Visualization Settings}.
+
+\paragraph{Arquitectura y diseño modular}
+La implementación sigue una arquitectura de responsabilidades distribuidas bajo \texttt{src/visualize\_data/}, organizando el código en capas especializadas: gestión de estado (\texttt{state/}), modelos de datos (\texttt{model/}), lógica de ejecución (\texttt{runtime/}), comandos VS Code (\texttt{commands/}) y componentes de interfaz (\texttt{views/}). Esta separación permite un mantenimiento escalable y facilita la extensión futura del sistema con nuevos tipos de gráficos y fuentes de datos.
+
+El estado del flujo de trabajo se persiste a nivel de workspace, garantizando que las configuraciones intermedias se mantengan entre sesiones de trabajo mientras el usuario experimenta con diferentes combinaciones de datos y parámetros de visualización.
+
+\paragraph{Catálogo de tipos de gráfico}
+El selector de gráficos presenta un catálogo dinámico de tipos de visualización BabiaXR, cada uno especializado en diferentes modalidades de representación de datos: gráficos de barras (\emph{Bar}), diagramas de sectores (\emph{Pie}, \emph{Donut}), visualizaciones de burbujas (\emph{Bubbles}), representaciones cilíndricas 3D (\emph{Cylinders}), mapas de barras sobre superficies (\emph{Barsmap}), distribuciones cilíndricas espaciales (\emph{Cylindermap}) y composiciones híbridas (\emph{Boats}). Cada tipo de gráfico define un conjunto específico de dimensiones requeridas y opcionales (p.\,ej., \texttt{key}, \texttt{size}, \texttt{color}, \texttt{height}) junto con su plantilla HTML/A-Frame asociada.
+
+% TODO: Capturar screenshot del selector de gráficos mostrando la lista completa
+% con iconos y descripciones de cada tipo disponible
+% Nombre sugerido: ui-chart-type-selector-complete.png
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.58\linewidth]{img/graficos_babiaxr.png}
+\caption{Selector de gráficos disponibles en \emph{Visualize Data}, mostrando la diversidad de tipos de visualización BabiaXR soportados.}
+\label{fig:visualize-chart-selector}
+\end{figure}
+
+\paragraph{Análisis inteligente de datos JSON}
+Una vez seleccionado el tipo de gráfico, el sistema implementa un analizador de datos JSON sofisticado que examina exhaustivamente la estructura y contenido del fichero seleccionado. El proceso de análisis detecta automáticamente los tipos de campo (\emph{string}, \emph{number}, \emph{boolean}, \emph{object}, \emph{array}), identifica campos numéricos mediante validación estricta, recopila valores de muestra para cada campo y calcula estadísticas de completitud de datos.
+
+Esta información se presenta al usuario en forma de resumen estructurado que incluye el número total de registros, la lista de campos disponibles con sus tipos detectados y ejemplos de valores, permitiendo una toma de decisiones informada durante el proceso de mapeo de dimensiones.
+
+\paragraph{Mapeo de dimensiones con validación contextual}
+El proceso de mapeo de dimensiones constituye el corazón del sistema de transformación, permitiendo al usuario asignar campos específicos del JSON a las dimensiones requeridas por el tipo de gráfico seleccionado. El sistema implementa validación contextual inteligente: las dimensiones que requieren datos numéricos (como \texttt{size} o \texttt{height}) filtran automáticamente la lista de campos disponibles para mostrar únicamente aquellos identificados como numéricos durante el análisis previo.
+
+La interfaz proporciona retroalimentación en tiempo real sobre el estado de configuración, destacando dimensiones obligatorias sin mapear, alertando sobre reutilización de campos en múltiples dimensiones y validando la coherencia general del mapeo antes de permitir el lanzamiento de la visualización.
+
+% TODO: Capturar screenshot del proceso de mapeo de dimensiones mostrando:
+% - Lista de dimensiones del gráfico (key, size, color, etc.)
+% - Dropdown de campos JSON filtrados por tipo
+% - Indicadores de validación (required, optional, warnings)
+% Nombre sugerido: ui-dimension-mapping-process.png
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\linewidth]{img/ui-dimension-mapping-process.png}
+\caption{Interfaz de mapeo de dimensiones con validación contextual, mostrando la asignación de campos JSON a dimensiones del gráfico con filtrado por tipo de dato.}
+\label{fig:ui-dimension-mapping-process}
+\end{figure}
+
+\paragraph{Generación de plantillas y persistencia inteligente}
+Una vez completado el mapeo, el sistema orquesta un proceso de generación sofisticado que combina la plantilla HTML del tipo de gráfico seleccionado con los datos mapeados y las preferencias de \emph{Visualization Settings}. El motor de plantillas inyecta automáticamente la configuración de paleta de colores, ambiente visual, configuración de suelo e iluminación en la escena A-Frame resultante.
+
+Cada visualización generada se almacena de forma persistente en el \texttt{globalStorage} de VS Code bajo una estructura de directorios única que combina el nombre proporcionado por el usuario con un nonce criptográfico de 8 bytes (\texttt{Poblacion\_Continentes\_40d691b270d179f1}), garantizando unicidad y previniendo conflictos de nombres. Cada directorio contiene \texttt{index.html} (la visualización completa lista para servir) y \texttt{data.json} (copia local de los datos originales).
+
+\paragraph{Browse Visualizations: gestión de biblioteca personal}
+El apartado \emph{Browse Visualizations} proporciona una interfaz de gestión completa para la biblioteca personal de visualizaciones del usuario. El sistema escanea automáticamente el \texttt{globalStorage} para descubrir visualizaciones previamente creadas, valida la integridad de los archivos requeridos y presenta una lista organizada con opciones de relanzamiento individual y limpieza masiva mediante \emph{Reset All}.
+
+Esta funcionalidad transforma \emph{Visualize Data} en una herramienta de uso recurrente donde los usuarios pueden mantener una colección personal de visualizaciones reutilizables, experimentar con diferentes configuraciones y compartir visualizaciones mediante el sistema de servidores integrado.
+
+% TODO: Capturar screenshot de la sección Browse Visualizations mostrando:
+% - Lista de visualizaciones almacenadas con nombres únicos
+% - Botones de acción (Launch, Reset All)
+% - Indicadores de estado de archivos (válidos/inválidos)
+% Nombre sugerido: ui-browse-visualizations-library.png
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.70\linewidth]{img/ui-visualize-data.png}
+\caption{Interfaz completa de \emph{Visualize Data} mostrando el flujo de trabajo paso a paso y la gestión de biblioteca de visualizaciones almacenadas.}
+\label{fig:ui-visualize-data}
+\end{figure}
+
+\paragraph{Integración ecosistémica y herencia de configuración}
+El subsistema se integra de manera transparente con el ecosistema completo de Code-XR, delegando el lanzamiento de servidores al \texttt{MultiServerLauncher} para garantizar consistencia en el comportamiento de red (HTTP/HTTPS, selección automática de puertos, apertura en panel o navegador) y registrando automáticamente cada visualización en el registro de \emph{Active Servers} con nombres personalizados que facilitan la identificación.
+
+La herencia automática de configuración desde \emph{Visualization Settings} garantiza que todas las visualizaciones generadas respeten las preferencias estéticas del usuario sin requerir configuración adicional, aplicando de forma consistente paletas de colores, ambientes XR, configuración de suelo e iluminación a través de la integración con el motor de plantillas centralizado.
+
+\paragraph{Validación robusta y prevención de errores}
+El sistema implementa un esquema de validación multicapa que abarca desde la validación de formato JSON hasta la prevención de lanzamientos duplicados. El analizador de JSON maneja graciosamente archivos malformados, datasets de gran tamaño y estructuras de datos complejas, mientras que el validador de mapeo de dimensiones previene configuraciones incompletas o inconsistentes.
+
+La prevención de duplicados opera tanto a nivel de campos (alertando sobre reutilización en múltiples dimensiones) como a nivel de servidores activos (evitando el lanzamiento de visualizaciones ya en ejecución), proporcionando una experiencia de usuario fluida y libre de conflictos. Los mensajes de error contextuales guían al usuario hacia la resolución de problemas específicos, mientras que la habilitación/deshabilitación dinámica de controles UI mantiene la coherencia del flujo de trabajo.
+
+
+%---------------------------
+% Visualization Settings
+%---------------------------
+
+\subsection{Visualization Settings}
+\label{sec:visualization-settings}
+
+El apartado \emph{Visualization Settings} constituye el sistema de configuración visual global de Code-XR, permitiendo personalizar cuatro aspectos fundamentales que se aplicarán automáticamente a todas las visualizaciones generadas: \textbf{color de fondo}, \textbf{color del suelo}, \textbf{preset del entorno} y \textbf{paleta de gráficos}. Este módulo se integra como una sección adicional en el árbol principal de la extensión, proporcionando una interfaz intuitiva para la gestión de preferencias visuales persistentes.
+
+\paragraph{Arquitectura y persistencia de configuración}
+El subsistema sigue una arquitectura modular distribuida en capas especializadas bajo \texttt{src/visualization\_settings/}, implementando separación clara entre modelo de datos (\texttt{model/}), almacenamiento (\texttt{storage/}), comandos (\texttt{commands/}), vistas (\texttt{views/}) y utilidades (\texttt{utils/}). La persistencia se gestiona mediante un sistema de doble capa: almacenamiento primario en fichero JSON ubicado en el \texttt{globalStorage} de VS Code (\texttt{visualization-settings.json}) y respaldo en \texttt{globalState} para compatibilidad con versiones anteriores.
+
+Esta aproximación garantiza que las configuraciones se mantengan entre sesiones y workspaces, con migración automática desde el sistema legacy y validación estricta de formatos. El fichero de configuración emplea una estructura simplificada que mapea los cuatro parámetros visuales:
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.9\linewidth}
+\begin{lstlisting}[language=json,
+caption={Estructura del archivo \texttt{visualization-settings.json} que persiste las preferencias visuales globales.},
+label={fig:visualization-settings-json}]
+{
+  "backgroundColor": "#FFFFFF",
+  "groundColor": "#000000",
+  "environment": "forest", 
+  "palette": "ubuntu"
+}
+\end{lstlisting}
+\end{minipage}
+\end{figure}
+
+\paragraph{Interfaz de usuario y experiencia visual}
+La sección \emph{Visualization Settings} se presenta como un apartado colapsible dentro del árbol principal de Code-XR, exponiendo cada parámetro como un elemento interactivo con iconografía contextual diferenciada. Los parámetros \emph{Background Color} y \emph{Ground Color} muestran muestras de color generadas dinámicamente como iconos SVG de 16×16 píxeles que reflejan visualmente el color seleccionado, mientras que \emph{Environment Preset} utiliza un icono de globo terráqueo y \emph{Chart Palette} emplea un símbolo de paleta artística. Esta representación visual permite al usuario identificar rápidamente el estado actual de su configuración sin necesidad de navegar por los paneles de ajuste.
+
+% TODO: Capturar screenshot del apartado Visualization Settings en el árbol de Code-XR 
+% mostrando los 4 elementos con sus iconos dinámicos de color
+% Nombre sugerido: ui-visualization-settings-tree.png
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.60\linewidth]{img/ui-visualization-settings-tree.png}
+\caption{Vista del apartado \emph{Visualization Settings} integrado en el árbol principal, mostrando iconos dinámicos de color para los parámetros visuales.}
+\label{fig:ui-visualization-settings-tree}
+\end{figure}
+
+\paragraph{Flujo de configuración de colores}
+La configuración de colores (\emph{Background} y \emph{Ground}) implementa un flujo híbrido que prioriza la experiencia nativa del navegador. Al hacer clic en cualquiera de estos parámetros, el sistema despliega un panel webview personalizado que integra el selector de color HTML5 nativo, proporcionando una interfaz familiar con preview en tiempo real y validación automática del formato hexadecimal (\texttt{\#RRGGBB}).
+
+% TODO: Capturar screenshot del panel de selección de colores (webview) 
+% mostrando el color picker HTML5 con el color actual seleccionado
+% Nombre sugerido: ui-color-picker-panel.png
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\linewidth]{img/ui-color-picker-panel.png}
+\caption{Panel de selección de colores mediante webview integrado, utilizando el selector HTML5 nativo con validación en tiempo real.}
+\label{fig:ui-color-picker-panel}
+\end{figure}
+
+Como alternativa de respaldo, el sistema ofrece un flujo basado en \emph{QuickPick} que presenta una selección de colores predefinidos junto con la opción de introducir valores hexadecimales personalizados. Este mecanismo incluye validación con reintentos (hasta 3 intentos) y mensajes contextuales que guían al usuario hacia el formato correcto.
+
+\paragraph{Configuración de entornos y paletas}
+Los parámetros \emph{Environment Preset} y \emph{Chart Palette} emplean una interfaz de selección mediante \emph{QuickPick} que presenta las opciones disponibles con etiquetas descriptivas y contextuales. El catálogo de entornos abarca 12 presets predefinidos de A-Frame (\texttt{forest}, \texttt{tron}, \texttt{egypt}, \texttt{dream}, \texttt{volcano}, \texttt{arches}, etc.) que redefinen completamente la ambientación visual y atmosférica de las escenas XR, desde bosques realistas hasta paisajes futuristas estilo \emph{Tron}. Paralelamente, las paletas de gráficos proporcionan 9 esquemas cromáticos especializados de BabiaXR (\texttt{ubuntu}, \texttt{blues}, \texttt{sunset}, \texttt{foxy}, \texttt{icecream}, etc.), cada uno optimizado para diferentes contextos de visualización y tipos de datos.
+
+% TODO: Capturar screenshot del QuickPick de Environment Preset
+% mostrando la lista de entornos disponibles (forest, tron, egypt, etc.) 
+% Nombre sugerido: ui-environment-preset-quickpick.png
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.70\linewidth]{img/ui-environment-preset-quickpick.png}
+\caption{Selector \emph{QuickPick} para \emph{Environment Preset}, mostrando la gama de entornos A-Frame disponibles con descripciones contextuales.}
+\label{fig:ui-environment-preset-quickpick}
+\end{figure}
+
+% TODO: Capturar screenshot del QuickPick de Chart Palette
+% mostrando la lista de paletas disponibles (ubuntu, blues, sunset, etc.)
+% Nombre sugerido: ui-chart-palette-quickpick.png
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.70\linewidth]{img/ui-chart-palette-quickpick.png}
+\caption{Selector \emph{QuickPick} para \emph{Chart Palette}, mostrando las paletas de colores BabiaXR con vistas previas.}
+\label{fig:ui-chart-palette-quickpick}
+\end{figure}
+
+\paragraph{Aplicación automática en visualizaciones}
+La verdadera potencia de \emph{Visualization Settings} reside en su integración transparente con el motor de plantillas de Code-XR. Cada vez que se genera una visualización (ya sea desde \emph{Babia Examples}, \emph{Visualize Data} o análisis de código), el sistema invoca automáticamente \texttt{getVisualizationConfiguration()}, que recupera las preferencias activas y las inyecta en las plantillas HTML/A-Frame correspondientes.
+
+Este proceso de sustitución mapea cada parámetro a atributos específicos de los componentes:
+\begin{itemize}
+\item \textbf{Background Color} $\rightarrow$ atributo \texttt{background="color: \#FFFFFF"} de la escena A-Frame
+\item \textbf{Environment Preset} $\rightarrow$ componente \texttt{environment="preset: forest"} 
+\item \textbf{Ground Color} $\rightarrow$ parámetro \texttt{groundColor: \#000000} del entorno
+\item \textbf{Chart Palette} $\rightarrow$ atributo \texttt{palette: ubuntu} en componentes BabiaXR
+\end{itemize}
+
+\paragraph{Iconografía dinámica y representación visual}
+Una característica particularmente distintiva del sistema es la generación automática de iconos SVG que funcionan como indicadores visuales directos en la interfaz de usuario. Para los parámetros \emph{Background Color} y \emph{Ground Color}, la extensión genera dinámicamente pequeños cuadrados de color de 16×16 píxeles que se muestran como iconos junto a cada elemento en el árbol de Code-XR, permitiendo al usuario identificar de un vistazo qué colores tiene configurados sin necesidad de abrir los paneles de configuración.
+
+Estos iconos SVG se crean bajo demanda cada vez que el usuario modifica un color, aplicando efectos sutiles de borde y sombra interior para garantizar la legibilidad sobre diferentes temas de VS Code (claro y oscuro). La nomenclatura empleada (\texttt{\{settingKey\}\_\{hexcolor\}.svg}) permite un sistema de caché eficiente: si el usuario vuelve a seleccionar un color previamente usado, el icono se reutiliza en lugar de regenerarse. El sistema implementa limpieza automática de iconos obsoletos cuando se cambian los valores, evitando la acumulación progresiva de archivos temporales en el \texttt{globalStorage}.
+
+\paragraph{Validación y robustez del sistema}
+El subsistema implementa un esquema de validación multicapa que garantiza la integridad de la configuración: validación estricta de formato hexadecimal para colores mediante expresión regular (\texttt{/\^\#[0-9a-fA-F]\{6\}\$/}), verificación de correspondencia de presets con los catálogos oficiales de A-Frame y BabiaXR, y mecanismos de recuperación automática que restauran valores por defecto ante configuraciones corrompidas o incompatibles. La experiencia de usuario se complementa con retroalimentación contextual mediante mensajes informativos, indicadores visuales de estado y deshabilitación inteligente de controles según el flujo de configuración activo.
+
+Esta aproximación de validación progresiva, combinada con la persistencia dual y la integración transparente con el motor de plantillas, posiciona a \emph{Visualization Settings} como un sistema maduro y confiable que equilibra flexibilidad de personalización con robustez operacional, proporcionando a los usuarios un control granular y consistente sobre la estética de todas las visualizaciones XR generadas por Code-XR.
+
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
