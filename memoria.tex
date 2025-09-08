@@ -43,6 +43,37 @@
 \usepackage{microtype}  % mejora espaciado y reduce underfull hbox
 % ...existing code...
 \usetikzlibrary{positioning}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstdefinelanguage{json}{
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!5},
+    stringstyle=\color{blue},
+    keywordstyle=\color{teal},
+    commentstyle=\color{gray},
+    morestring=[b]",
+    literate=
+     *{0}{{{\color{red}0}}}{1}
+      {1}{{{\color{red}1}}}{1}
+      {2}{{{\color{red}2}}}{1}
+      {3}{{{\color{red}3}}}{1}
+      {4}{{{\color{red}4}}}{1}
+      {5}{{{\color{red}5}}}{1}
+      {6}{{{\color{red}6}}}{1}
+      {7}{{{\color{red}7}}}{1}
+      {8}{{{\color{red}8}}}{1}
+      {9}{{{\color{red}9}}}{1}
+}
+
+
 
 
 % Macro para mostrar rutas de ficheros y permitir quiebres
@@ -1052,11 +1083,127 @@ En las primeras versiones el servidor era mínimamente funcional: servía un HTM
 
 Llegados a este punto de mínima funcionalidad, con la capacidad de servir los servidores en modo HTTPS, se pudo dar por concluido el primer hito y avanzar hacia las siguientes etapas del desarrollo. No obstante, antes de continuar, en la próxima subsección se detalla el estado actual del sistema de lanzamiento de servidores, tanto en lo referente a la interfaz de usuario como a su funcionamiento interno dentro del plugin.
 
-\subsection{Versión actual — lanzamiento de servidores (TO DO)}
-TO DO: insertar aquí una captura de pantalla del UI de lanzamiento de servidores y detallar las opciones disponibles (HTTP/HTTPS, rutas de certificados, control de puerto, apertura en panel VS Code vs. navegador externo, opciones de apertura automática, registro de instancias en el \emph{registry}, etc.).  
+\subsection{Versión actual — lanzamiento y gestión de servidores}
+\label{sec:sprint-servers-current}
 
-En esta subsección se explicará cómo se exponen estas opciones en la interfaz, qué parámetros se persisten por sesión y cómo se integra el flujo de servidores con el sistema de sesiones y con el canal SSE para actualizaciones en tiempo real. La descripción técnica completa de la implementación (módulos TypeScript, API interna para arranque/parada, gestión de certificados y políticas de puerto) se incluirá en el apartado de implementación detallada de este sprint.
+En la versión actual de Code-XR, el subsistema de servidores proporciona un entorno robusto para servir visualizaciones con \textbf{arquitectura modular}, \textbf{persistencia de preferencias}, \textbf{multi-servidor concurrente}, \textbf{resolución automática de puertos}, \textbf{soporte HTTPS completo} y \textbf{gestión centralizada de estado}. El diseño sigue patrones de desarrollo escalables con separación clara de responsabilidades y gestión de ciclo de vida automatizada, a continuación se detallan los componentes clave, para detalles mas específicos ver el código fuente en el repositorio\cite{code-xr}.
 
+\paragraph{Arquitectura modular del subsistema}
+El código se estructura en capas especializadas bajo \texttt{src/servers/} y \texttt{src/active\_servers/}, implementando una arquitectura de responsabilidades distribuidas:
+
+\begin{itemize}
+  \item \textbf{runtime}: Núcleo de ejecución con \texttt{httpServer.ts}, \texttt{httpsDefaultServer.ts}, \texttt{httpsCustomServer.ts}, \texttt{multiServerLauncher.ts}, \texttt{portManager.ts} y subsistema \texttt{sse/} para comunicación bidireccional.
+  \item \textbf{storage}: \texttt{serverSettingsManager.ts} implementa persistencia con \emph{deep merge}, validación atómica y migraciones de esquema.
+  \item \textbf{registry}: \texttt{activeServerRegistry.ts} (singleton) gestiona el estado centralizado con eventos síncronos para UI.
+  \item \textbf{services}: \texttt{serverRegistrar.ts} valida registros, \texttt{panelManager.ts} controla WebviewPanels del editor.
+  \item \textbf{views}: Integración con TreeView gracias a \texttt{ActiveServersSectionProvider.ts}.
+\end{itemize}
+
+
+
+\paragraph{Configuración y persistencia (globalStorage)}
+El \texttt{ServerSettingsManager} (patrón singleton) gestiona preferencias mediante archivo JSON \texttt{server-settings.json} guardado en \texttt{globalStorage} usando \texttt{context.globalStorageUri}, garantizando \textbf{persistencia cross-workspace}. Cuando el usuario cambia la configuracion ya sea usando la interfaz del UI o a través de comandos el fichero se actualiza automáticamente. La estructura de configuración consta con los siguientes campos:
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.9\linewidth}
+\begin{lstlisting}[language=json,
+caption={Ejemplo del archivo \texttt{server-settings.json} que persiste la configuración de servidores en Code-XR.},
+label={fig:server-settings-json}]
+{
+  "mode": "HTTPS",
+  "https": { "certSource": "default",
+             "certPath": "certs/babia_cert.pem",
+             "keyPath":  "certs/babia_key.pem" },
+  "defaultPort": 3000,
+  "launch": { "autoOpen": true, "openMode": "browser" },
+  "configNonce": "37a3047821ba23de99348bcba2d155c3",
+  "version": "1.0.0"
+}
+\end{lstlisting}
+\end{minipage}
+\end{figure}
+
+
+El \texttt{configNonce} (SHA-256) previene corrupción en actualizaciones concurrentes, mientras que \texttt{version} permitiría hacer migraciones si el esquema cambia en futuras versiones.
+
+\paragraph{UI de configuración avanzada}
+El panel de configuración (Figura~\ref{fig:ui-server-config}) expone controles granulares: selección \textbf{HTTP/HTTPS} con validación de certificados, configuración de \textbf{puerto por defecto} con verificación de disponibilidad, es decir, se buscara un puerto libre desde el selecionado por defecto, \textbf{apertura automática} configurable, \textbf{modo de lanzamiento} (panel VS Code vs navegador), funciones de \textbf{reset/restore} y lanzamiento directo con la configuración activa.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\linewidth]{img/ui-server-config.png}
+\caption{Panel de configuración avanzada de servidores en Code-XR con validación en tiempo real.}
+\label{fig:ui-server-config}
+\end{figure}
+
+\paragraph{Multi-servidor concurrente y gestión inteligente de puertos}
+El \texttt{MultiServerLauncher} orquesta \textbf{instancias concurrentes} con identificadores únicos (\texttt{server-\{port\}-\{timestamp\}}), tipado fuerte (\texttt{http | https-default | https-custom}) y metadatos completos (puerto, archivo servido, registro activo). El \texttt{PortManager} implementa descubrimiento automático de puertos mediante:
+
+\begin{enumerate}
+  \item Verificación de disponibilidad en puerto preferido usando bind a \texttt{0.0.0.0}
+\item Resolución automática de colisiones mediante la librería \texttt{get-port}\cite{get-port}, que realiza una búsqueda secuencial desde el puerto por defecto configurado hasta el rango superior (8080), seleccionando el primer puerto disponible.
+  \item Fallback manual con límites configurables y notificación al usuario
+  \item Soporte multi-puerto para servicios paralelos
+\end{enumerate}
+
+Ante colisiones, el sistema notifica transparentemente la reasignación: \emph{``Puerto 3000 ocupado, servidor lanzado en puerto 3001''}.
+
+\paragraph{HTTPS y gestión de certificados}
+El soporte HTTPS implementa dos modalidades con validación previa:
+
+\begin{itemize}
+  \item \textbf{Certificados por defecto}: Par \texttt{cert/key} incluido en \texttt{certs/} (generados con \texttt{OpenSSL}\cite{openssl}), permitiendo HTTPS inmediato sin configuración.
+  \item \textbf{Certificados personalizados}: Selector de archivos con validación de compatibilidad OpenSSL, rutas absolutas y verificación de integridad antes del lanzamiento.
+\end{itemize}
+
+El sistema detecta automáticamente conflictos \textbf{HTTPS + panel lateral} (incompatibilidad de seguridad VS Code) y sugiere apertura del servidor en navegador web con un mensaje contextual.
+
+\paragraph{Active Servers: registro centralizado y observabilidad}
+La vista \emph{Active Servers} expone un \textbf{registro centralizado} (\texttt{ActiveServerRegistry}, singleton con patrón Observer) que rastrea instancias activas con:
+
+\begin{itemize}
+  \item \textbf{Estado completo}: ID único, puerto, URL, modo de lanzamiento, certificados, timestamp, estado (\texttt{running|stopped|error}).
+  \item \textbf{Metadatos contextuales}: Archivo servido, nombre personalizado, sesión de análisis asociada, configuración de red.
+  \item \textbf{Etiquetado inteligente}: Prioridad \texttt{customName} $\rightarrow$ \texttt{localhost:port}, descripción con \texttt{launchMode} y indicadores de estado.
+  \item \textbf{Acciones contextuales}: \emph{Open in Browser}, \emph{Open in Panel} (solo HTTP), \emph{Copy URL} (local/red), \emph{Stop}, \emph{Server Details} y \emph{Stop All} (disponible con 2+ servidores).
+  \item \textbf{Iconografía diferenciada}: Globe (HTTP), Shield (HTTPS-default), Shield-check (HTTPS-custom) con colorimetría por estado (verde/gris/rojo).
+\end{itemize}
+
+El registro es \textbf{efímero} (no persiste entre sesiones) para prevenir servidores zombie y garantizar coherencia de entorno (puertos disponibles, interfaces de red, certificados válidos).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\linewidth]{img/ui-active-servers.png}
+\caption{Vista \emph{Active Servers}: registro centralizado con acciones contextuales y estado en tiempo real.}
+\label{fig:ui-active-servers}
+\end{figure}
+
+\paragraph{Comunicación en tiempo real (SSE) y sincronización}
+Los servidores exponen endpoints \texttt{/events} con \emph{Server-Sent Events} (SSE) que implementan:
+
+\begin{itemize}
+  \item \textbf{Propagación automática}: Cambios de análisis, actualizaciones de datos y eventos de sistema sin polling.
+  \item \textbf{Gestión de clientes}: Registro/limpieza automática de conexiones SSE por archivo analizado.
+  \item \textbf{Mapeo archivo-servidor}: Asociación directa entre sesiones de análisis y servidores activos para updates dirigidos.
+  \item \textbf{Bus de comunicación}: El servidor actúa como intermediario entre extensión y visualizaciones web.
+\end{itemize}
+
+\paragraph{Integración con análisis y limpieza automática}
+El sistema implementa \textbf{limpieza coordinada} entre componentes:
+
+\begin{enumerate}
+  \item \textbf{Parada de servidor}: Cierra paneles laterales, limpia clientes SSE, elimina mapeos archivo-servidor, cierra sesiones de análisis asociadas.
+  \item \textbf{Gestión de ciclo de vida}: Validación periódica de estado, detección de servidores zombie, recovery automático de errores.
+  \item \textbf{Sincronización UI}: Eventos del registro activo actualizan TreeView en tiempo real, comandos VS Code integrados.
+  \item \textbf{Cleanup de extensión}: Liberación ordenada de todos los recursos al desactivar Code-XR.
+\end{enumerate}
+
+\paragraph{Acceso de red y compatibilidad VR/móvil}
+El \texttt{NetworkUtils} detecta automáticamente la IP local y genera URLs de acceso externo, facilitando el uso desde dispositivos VR o móviles en la misma red. Los servidores se configuran con bind a \texttt{0.0.0.0} (todas las interfaces) y proporcionan diagnósticos de red para troubleshooting.
+
+\paragraph{Síntesis técnica}
+El subsistema combina \textbf{arquitectura modular escalable}, \textbf{configuración persistente con validación}, \textbf{multi-servidor concurrente robusto}, \textbf{gestión inteligente de puertos}, \textbf{HTTPS} y \textbf{registro centralizado con observabilidad}. La integración completa con VS Code (TreeView, comandos, paneles) y el canal SSE bidireccional posicionan este módulo como la columna vertebral técnica de Code-XR, proporcionando una base sólida para el ecosistema de visualización XR.
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
