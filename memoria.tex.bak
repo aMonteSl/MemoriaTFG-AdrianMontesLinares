@@ -255,7 +255,7 @@ Y, por último, a todas aquellas personas que, de una manera u otra, han formado
 %\addcontentsline{toc}{chapter}{Resumen} % si queremos que aparezca en el índice
 \markboth{RESUMEN}{RESUMEN} % encabezado
 
-Code‑XR es una propuesta pensada para cambiar la forma en que los desarrolladores analizan y entienden su código en tiempo real. Se trata de un plugin para Visual Studio Code, que permite visualizar a tiempo real métricas avanzadas del código como la complejidad ciclomática entre otras métricas como media de parámetros por función, número de lineas totales del fichero...
+Code‑XR es una propuesta pensada para cambiar la forma en que los desarrolladores analizan y entienden su código en tiempo real. Se trata de un plugin para Visual Studio Code, que permite visualizar a tiempo real métricas avanzadas del código como la complejidad ciclomática entre otras metricas como media de parámetros por función, número de lineas totales del fichero...
 
 Lo que realmente lo hace distinto es su integración con entornos de realidad extendida. Gracias a esto, el análisis de proyectos complejos se vuelve más intuitivo, inmersivo y accesible, incluso para quienes no están acostumbrados a interpretar métricas a simple vista.
 
@@ -2438,7 +2438,7 @@ Estas propuestas ampliarían las capacidades de Code-XR abriendo nuevas posibili
 \chapter{Manual de usuario}
 \label{app:manual}
 
-El plugin es bastante sencillo de entender en cuanto a su manejo gracias a la interfaz gráfica. De todas formas, se dispone de un vídeo tutorial en la página web oficial del plugin, el cual detalla qué hace cada sección.
+El plugin es bastante sencillo de entender en cuanto a su manejo gracias a la interfaz gráfica. De todas formas, se dispone de un video tutorial en la página web oficial del plugin, el cual detalla qué hace cada sección.
 
 Para aquellos que quieran ver directamente el tutorial, pueden acceder a través del siguiente enlace: \url{https://youtu.be/KRgLdLZJXHA}
 
