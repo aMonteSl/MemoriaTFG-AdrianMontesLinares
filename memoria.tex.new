@@ -1,0 +1,790 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Plantilla de memoria en LaTeX para la EIF - Universidad Rey Juan Carlos
+%%
+%% Por Gregorio Robles <grex arroba gsyc.urjc.es>
+%%     Grupo de Sistemas y Comunicaciones
+%%     Escuela de Ingeniería de Fuenlabrada
+%%     Universidad Rey Juan Carlos
+%% (muchas ideas tomadas de Internet, colegas del GSyC, antiguos alumnos...
+%%  etc. Muchas gracias a todos)
+%%
+%% La última versión de esta plantilla está siempre disponible en:
+%%     https://github.com/gregoriorobles/plantilla-memoria
+%%
+%% Para obtener PDF, ejecuta en la shell:
+%%   make
+%% (las imágenes deben ir en PNG o JPG)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper, 12pt]{book}
+%\usepackage[T1]{fontenc}
+
+\usepackage[a4paper, left=2.5cm, right=2.5cm, top=3cm, bottom=3cm]{geometry}
+\usepackage{times}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel} % Comenta esta línea si tu memoria es en inglés
+\usepackage{url}
+%\usepackage[dvipdfm]{graphicx}
+\usepackage{graphicx}
+\usepackage{float}  %% H para posicionar figuras
+\usepackage[nottoc, notlot, notlof, notindex]{tocbibind} %% Opciones de índice
+\usepackage{latexsym}  %% Logo LaTeX
+\usepackage{pgfgantt}
+\usepackage{float} % para usar [H] en figures
+\usepackage{adjustbox} % para redimensionar diagramas si son muy anchos
+% Load hyperref last so TOC, refs and links become clickable
+\usepackage[hidelinks,unicode,pdfencoding=auto]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.multipart}
+\usepackage{enumitem} 
+% ...existing code...
+\usepackage{xurl}       % permite romper URLs/rutas largas en saltos de línea
+\usepackage{microtype}  % mejora espaciado y reduce underfull hbox
+% ...existing code...
+\usetikzlibrary{positioning}
+% En el preámbulo, después de \usepackage{listings}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Definición de JSON para listings
+\definecolor{stringcolor}{RGB}{42,161,152}
+\definecolor{keywordcolor}{RGB}{38,139,210}
+\definecolor{numbercolor}{RGB}{181,137,0}
+
+% Definición del lenguaje JSON
+\lstdefinelanguage{json}{
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{white},
+    literate=
+     *{0}{{{\color{numbercolor}0}}}{1}
+      {1}{{{\color{numbercolor}1}}}{1}
+      {2}{{{\color{numbercolor}2}}}{1}
+      {3}{{{\color{numbercolor}3}}}{1}
+      {4}{{{\color{numbercolor}4}}}{1}
+      {5}{{{\color{numbercolor}5}}}{1}
+      {6}{{{\color{numbercolor}6}}}{1}
+      {7}{{{\color{numbercolor}7}}}{1}
+      {8}{{{\color{numbercolor}8}}}{1}
+      {9}{{{\color{numbercolor}9}}}{1}
+      {:}{{{\color{keywordcolor}{:}}}}{1}
+      {,}{{{\color{keywordcolor}{,}}}}{1}
+      {\{}{{{\color{keywordcolor}{\{}}}}{1}
+      {\}}{{{\color{keywordcolor}{\}}}}}{1}
+      {[}{{{\color{keywordcolor}{[}}}}{1}
+      {]}{{{\color{keywordcolor}{]}}}}{1},
+    string=[s]{"}{"},
+    stringstyle=\color{stringcolor},
+    comment=[l]{:},
+    commentstyle=\color{keywordcolor}
+}
+
+% Definición del lenguaje TypeScript
+\lstdefinelanguage{typescript}{
+  keywords={abstract, any, as, break, case, catch, class, const, constructor, continue, debugger, declare, default, delete, do, else, enum, export, extends, false, finally, for, from, function, get, if, implements, import, in, instanceof, interface, is, let, module, namespace, new, null, of, package, private, protected, public, readonly, require, return, set, static, super, switch, this, throw, true, try, type, typeof, var, void, while, with, yield},
+  sensitive=true,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  morestring=[b]`
+}
+
+% Configuración global de listings
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  captionpos=b,
+  extendedchars=true
+}
+
+
+
+% Macro para mostrar rutas de ficheros y permitir quiebres
+\newcommand{\codepath}[1]{\path{#1}}
+% ...existing code...
+
+\hypersetup{
+  pdftitle={Code-XR — TFG},
+  pdfauthor={Adrián Montes Linares},
+  bookmarks=true,
+  pdfpagelabels=true,
+  plainpages=false
+}
+
+\raggedbottom
+
+
+% Escribe el título y el nombre del autor / autora para que se use bien
+% en otras partes de la plantilla
+% Dependiendo de las partes de la plantilla, a veces aparecerán tal
+% cual los escribas, a veces totalmente en mayúsculas, a veces de otras
+% formas
+\title{Code-XR: Plugin de VS Code para el análisis de código en Realidad Extendida}
+\author{Adrián Montes Linares}
+
+% Guarda el título, el autor y la fecha en variables
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\renewcommand{\baselinestretch}{1.5}  %% Interlineado
+
+\begin{document}
+
+\renewcommand{\refname}{Bibliografía}  %% Renombrando
+\renewcommand{\appendixname}{Apéndice}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PORTADA
+
+\begin{titlepage}
+\begin{center}
+\includegraphics[scale=0.6]{img/URJ_logo_Color_POS.png}
+
+\vspace{1.75cm}
+
+\LARGE
+ESCUELA DE INGENIERÍA DE FUENLABRADA
+\vspace{1cm}
+
+\LARGE
+INGENIERÍA TELEMÁTICA
+
+\vspace{1cm}
+\LARGE
+\textbf{TRABAJO FIN DE GRADO}
+
+\vspace{2cm}
+
+\Large
+\MakeUppercase{\thetitle}
+
+\vspace{2cm}
+
+\large
+Autor : \theauthor \\
+Tutor : Dr. David Moreno Lumbreras\\
+\vspace{1cm}
+
+\large
+Curso académico 2025/2026
+
+\end{center}
+\end{titlepage}
+
+\newpage
+\mbox{}
+\thispagestyle{empty} % para que no se numere esta pagina
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Licencia
+\clearpage
+\pagenumbering{gobble}
+\chapter*{}
+
+\vspace{12cm}
+
+%% Licencia de publicación en abierto elegida
+%% Ver detalles en https://ofilibre.urjc.es/guias/tfg-abierto/
+
+\begin{flushright}
+\includegraphics[scale=0.6]{img/by-sa}
+%\includegraphics[scale=0.6]{img/by}
+
+%% Poner el año adecuado
+\noindent©2025 \theauthor  \\
+Algunos derechos reservados  \\
+Este documento se distribuye bajo la licencia \\
+``Atribución-CompartirIgual 4.0 Internacional'' de Creative Commons, \\
+disponible en \\
+\url{https://creativecommons.org/licenses/by-sa/4.0/deed.es}
+\end{flushright}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Dedicatoria
+
+\chapter*{}
+\pagenumbering{Roman} % para comenzar la numeracion de paginas en numeros romanos
+\begin{flushright}
+\textit{Dedicado a \\
+mi familia / mi abuelo / mi abuela}
+\end{flushright}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Agradecimientos
+
+\chapter*{Agradecimientos}
+%\addcontentsline{toc}{chapter}{Agradecimientos} % si queremos que aparezca en el índice
+\markboth{AGRADECIMIENTOS}{AGRADECIMIENTOS} % encabezado 
+
+Aquí vienen los agradecimientos\ldots Aunque está bien acordarse de la pareja, no hay que olvidarse de dar las gracias a tu madre, que aunque a veces no lo parezca disfrutará tanto de tus logros como tú\ldots 
+Además, la pareja quizás no sea para siempre, pero tu madre sí.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Resumen
+
+\chapter*{Resumen}
+%\addcontentsline{toc}{chapter}{Resumen} % si queremos que aparezca en el índice
+\markboth{RESUMEN}{RESUMEN} % encabezado
+
+Code‑XR es una propuesta pensada para cambiar la forma en que los desarrolladores analizan y entienden su código en tiempo real. Se trata de un plugin para Visual Studio Code, que permite visualizar a tiempo real métricas avanzadas del código como la complejidad ciclomática entre otras métricas como media de parámetros por función, número de lineas totales del fichero...
+
+Lo que realmente lo hace distinto es su integración con entornos de realidad extendida. Gracias a esto, el análisis de proyectos complejos se vuelve más intuitivo, inmersivo y accesible, incluso para quienes no están acostumbrados a interpretar métricas a simple vista.
+
+
+La lógica principal del plugin está implementada en TypeScript, lo que permite integrar funcionalidades avanzadas directamente en Visual Studio Code y aprovechar al máximo su API. Para la visualización inmersiva, Code‑XR utiliza A-Frame, un framework especializado en la creación de entornos de realidad virtual en la web, y BabiaXR, una herramienta que permite representar datos analíticos en gráficos 3D dentro del navegador. Las métricas de código se calculan mediante Python, mientras que la construcción de interfaces se realiza con HTML, CSS y JavaScript.
+
+
+En resumen, Code‑XR no es solo una herramienta técnica. Es una nueva forma de conectar con el código, de entenderlo y de trabajar con él de forma más clara, más visual y mucho más enriquecedora.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Resumen en inglés
+
+
+\chapter*{Summary}
+%\addcontentsline{toc}{chapter}{Summary} % si queremos que aparezca en el índice
+\markboth{SUMMARY}{SUMMARY} % encabezado
+
+Code-XR is an idea proposed to change the way in which developers inspect and understand their program code in real time. It is a plugin for Visual Studio Code that allows you to view advanced code metrics on the fly such as cyclomatic complexity, average number of parameters per function, total number of lines per file, etc.
+
+What makes Code-XR most distinctive is its ability to coexist with extended reality environments. Because of that, the interpretation of complex projects is simplified and becomes more intuitive and accessible for people who are not used to deciphering metrics at a glance.
+
+The plugin's primary logic is developed in TypeScript so that advanced functionality is integrated directly into Visual Studio Code and the full power of its API is leveraged. For immersive visualizations, Code-XR uses A-Frame, an engine for authoring web-based virtual reality scenes, together with BabiaXR, a component for visualizing analytical data as 3D diagrams in the browser. Python computes the code metrics, while HTML, CSS and JavaScript are used to build the user interface.
+
+In short, Code-XR is not just another tool. It provides an alternative means to interact with your code easier to read, easier to visualize, and ultimately an enriched development experience.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ÍNDICES %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Las buenas noticias es que los índices se generan automáticamente.
+% Lo único que tienes que hacer es elegir cuáles quieren que se generen,
+% y comentar/descomentar esa instrucción de LaTeX.
+
+%%%% Índice de contenidos
+\tableofcontents 
+%%%% Índice de figuras
+\cleardoublepage
+%\addcontentsline{toc}{chapter}{Lista de figuras} % para que aparezca en el indice de contenidos
+\listoffigures % indice de figuras
+%%%% Índice de tablas
+%\cleardoublepage
+%\addcontentsline{toc}{chapter}{Lista de tablas} % para que aparezca en el indice de contenidos
+%\listoftables % indice de tablas
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INTRODUCCIÓN %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\cleardoublepage
+\chapter{Introducción}
+\label{sec:intro} % etiqueta para poder referenciar luego en el texto con ~\ref{sec:intro}
+\pagenumbering{arabic} % para empezar la numeración de página con números
+
+% En este capítulo se introduce el proyecto.
+% Debería tener información general sobre el mismo, dando la información sobre el contexto en el que se ha desarrollado.
+
+% No te olvides de echarle un ojo a la página con los cinco errores de escritura más frecuentes\footnote{\url{http://www.tallerdeescritores.com/errores-de-escritura-frecuentes}}.
+
+% Aconsejo a todo el mundo que mire y se inspire en memorias pasadas.
+% Las memorias de los proyectos que he llevado yo están (casi) todas almacenadas en mi web del GSyC\footnote{\url{https://gsyc.urjc.es/~grex/pfcs/}}.
+
+% En mayo de 2023 me apunté a un curso de innovación docente donde nos pidieron hacer un podcast con temática docente. Aproveché entonces para hacer un podcast de unos 30 minutos donde en los primeros quince minutos introducía LaTeX y la memoria, y en los segundos hacía hincapién en aquellas cosas que más os cuestan utilizar en la memoria: las figuras, las tablas y las citas. Podéis escuchar el podcast en Internet\footnote{\url{https://podcasters.spotify.com/pod/show/gregorio-robles9/episodes/Tu-memoria-de-Trabajo-Fin-de-Grado-o-de-Mster-en-LaTeX-e23hucr/a-a58kp2}}.
+
+\section{Contexto y motivación}
+\label{sec:contexto}
+
+Es ampliamente aceptado que, a medida que los proyectos de software crecen, entender su arquitectura interna y evaluar su calidad se vuelve cada vez más desafiante para los desarrolladores~\cite{koschke2003software}. Las herramientas actuales de los entornos de desarrollo integrados (IDEs), como tablas, gráficos lineales o mapas de calor en 2D, ofrecen cierto apoyo al mostrar métricas estáticas, pero rara vez logran reflejar con claridad cómo se relacionan los distintos módulos del código. Esta limitación dificulta que los desarrolladores identifiquen, de forma rápida y precisa, problemas habituales de diseño, como la complejidad creciente o la duplicación de lógica~\cite{ball1996software,meyer2008seven}.
+
+Ante estas limitaciones, la comunidad científica ha comenzado a explorar técnicas inmersivas como la Realidad Virtual (VR) y la Realidad Aumentada (AR), enmarcadas bajo el concepto más general de Realidad Extendida (XR). Estas tecnologías permiten representar el software en espacios tridimensionales, facilitando la interpretación espacial de artefactos y métricas~\cite{demiralp2006cave}. Diversos trabajos han demostrado que el uso de entornos espaciales y la interacción corporal pueden mejorar tanto la comprensión como el nivel de compromiso del usuario~\cite{batch2019there}.
+
+Uno de los enfoques más influyentes ha sido el de la ciudad del software, introducido por herramientas como CodeCity~\cite{wettel2007visualizing} o ExplorViz~\cite{fittkau2015exploring}, donde funciones, clases y módulos se representan como edificios y distritos de una ciudad tridimensional. Esta aproximación transforma métricas técnicas (como líneas de código, parámetros o complejidad ciclomática) en atributos visuales (altura, base o color), permitiendo una percepción más inmediata de las zonas problemáticas del sistema.
+
+En este contexto, surge Code-XR, una herramienta que busca extender estas ideas al entorno real de trabajo de los desarrolladores: el propio IDE. El objetivo principal es integrar visualizaciones inmersivas y actualizadas en tiempo real directamente dentro de Visual Studio Code, sin necesidad de recurrir a dashboards externos ni cambiar de contexto. De este modo, se pretende facilitar una comprensión continua del estado del código durante el desarrollo, promoviendo un análisis más intuitivo y una toma de decisiones mejor fundamentada.
+
+\section{Objetivo y aportación de Code-XR}
+\label{sec:objetivo}
+
+El objetivo principal de Code-XR es investigar y demostrar el potencial de la Realidad Extendida (XR) para representar métricas de código en tiempo real dentro del propio entorno de desarrollo, con el fin de facilitar la comprensión estructural del software y apoyar la toma de decisiones durante el desarrollo.
+
+A diferencia de herramientas anteriores, que operan como sistemas independientes o requieren dashboards externos, Code-XR apuesta por una integración directa en el entorno de desarrollo (concretamente Visual Studio Code), permitiendo que los desarrolladores visualicen el impacto de sus cambios de forma continua mientras programan, sin necesidad de abandonar su flujo de trabajo~\cite{wettel2007visualizing, fittkau2015exploring}.
+
+Su propuesta se basa en mapear propiedades estáticas del código como el número de líneas, parámetros o la complejidad ciclomática a atributos visuales tridimensionales en una ciudad virtual: la altura de un edificio representa el tamaño, la base refleja la cantidad de parámetros, y el color la complejidad~\cite{wettel2007visualizing}. Esta metáfora permite identificar de forma intuitiva patrones como zonas de alta complejidad, crecimiento irregular o duplicación de lógica, incluso en proyectos grandes.
+
+Además, Code-XR introduce una segunda aportación relevante: el soporte opcional para la visualización inmersiva de la estructura DOM en aplicaciones web. Esto amplía el campo de aplicación de la herramienta más allá del análisis de código fuente, permitiendo explorar jerarquías HTML complejas en un espacio XR tridimensional~\cite{moreno2024enhancing}.
+
+En conjunto, las contribuciones principales de Code-XR son:
+
+\begin{itemize}
+    \item La visualización inmersiva en tiempo real de métricas de código directamente en el IDE.
+    \item El uso de tecnologías web XR accesibles, como A-Frame y BabiaXR, que facilitan su adopción sin necesidad de hardware especializado.
+    \item La incorporación de modos de visualización alternativos (escritorio 3D, realidad aumentada y DOM) adaptables a diferentes contextos de uso.
+    \item Una arquitectura ligera, extensible y configurable, pensada para ser utilizada tanto en entornos educativos como profesionales.
+\end{itemize}
+
+Estas aportaciones sientan las bases para futuras investigaciones empíricas que evalúen el impacto de las visualizaciones XR en la comprensión, la productividad y la calidad del software producido. También abren nuevas posibilidades en la colaboración entre desarrolladores, como sesiones de revisión de código compartidas en entornos virtuales~\cite{fittkau2015exploring}.
+
+\section{Descripción general de Code-XR}
+\label{sec:descripcion-general}
+
+
+Code-XR se integra directamente en Visual Studio Code, permitiendo al desarrollador analizar y visualizar métricas de código en tiempo real sin salir del entorno de desarrollo. El flujo de trabajo habitual comienza seleccionando un archivo o un directorio y lanzando el análisis desde el menú contextual. Las métricas extraídas líneas de código, número de parámetros, complejidad ciclomática entre otras métricas se actualizan automáticamente a medida que el usuario modifica el código.
+
+Para ello, Code-XR emplea un servidor local que comunica los cambios en tiempo real usando Server-Sent Events (SSE), permitiendo que la representación visual se mantenga sincronizada sin necesidad de refrescar manualmente.
+
+El sistema ofrece tres modos de visualización principales:
+
+\begin{itemize}
+    \item \textbf{LivePanel}: muestra las métricas extraídas en una interfaz 2D tradicional tipo panel. Es útil para obtener una vista rápida, numérica o textual de los datos mientras se codifica.
+    \item \textbf{XR Mode}: presenta una ciudad 3D donde cada función se representa como un edificio, con altura, base y color según sus métricas. Este modo es accesible tanto desde el navegador (modo escritorio) como desde un dispositivo de realidad aumentada (AR), conectándose al mismo servidor local~\cite{wettel2007visualizing, fittkau2015exploring}.
+    \item \textbf{DOM Mode}: pensado para proyectos web, representa la estructura del DOM HTML en 3D, facilitando la exploración jerárquica y la detección de anidamientos complejos~\cite{moreno2024enhancing}.
+\end{itemize}
+
+Todos los modos están diseñados para ser ligeros, accesibles y configurables, adaptándose a distintos contextos de uso (educativo, profesional, exploratorio).
+
+\textbf{Nota:} Además del modelo de ciudad 3D, Code-XR permite alternar entre otros gráficos para las visualizaciones de los datos, gracias a la integración con BabiaXR~\cite{moreno2022babiaxr}.
+
+
+
+
+% \section{Sección}
+% \label{sec:seccion}
+
+% Esto es una sección, que es una estructura menor que un capítulo. 
+
+% Por cierto, a veces me comentáis que no os compila por las tildes.
+% Eso es un problema de codificación.
+% Al guardar el archivo, guardad la codificación de ``ISO-Latin-1'' a ``UTF-8'' (o viceversa) y funcionará.
+
+% \subsection{Estilo}
+% \label{subsec:estilo}
+
+% Recomiendo leer los consejos prácticos sobre escribir documentos científicos en \LaTeX \ de Diomidis Spinellis\footnote{\url{https://github.com/dspinellis/latex-advice}}.
+
+% Lee sobre el uso de las comas\footnote{\url{http://narrativabreve.com/2015/02/opiniones-de-un-corrector-de-estilo-11-recetas-para-escribir-correctamente-la-coma.html}}. 
+% Las comas en español no se ponen al tuntún.
+% Y nunca, nunca entre el sujeto y el predicado (p.ej. en ``Yo, hago el TFG'' sobre la coma).
+% La coma no debe separar el sujeto del predicado en una oración, pues se cortaría la secuencia natural del discurso.
+% No se considera apropiado el uso de la llamada coma respiratoria o \emph{coma criminal}.
+% Solamente se suele escribir una coma para marcar el lugar que queda cuando omitimos el verbo de una oración, pero es un caso que se da de manera muy infrecuente al escribir un texto científico (p.ej. ``El Real Madrid, campeón de Europa'').
+
+% A continuación, viene una figura, la Figura~\ref{figura:foro_hilos}. 
+% Observarás que el texto dentro de la referencia es el identificador de la figura (que se corresponden con el ``label'' dentro de la misma). 
+% También habrás tomado nota de cómo se ponen las ``comillas dobles'' para que se muestren correctamente. 
+% Nota que hay unas comillas de inicio (``) y otras de cierre (''), y que son diferentes.
+% Volviendo a las referencias, nota que al compilar, la primera vez se crea un diccionario con las referencias, y en la segunda compilación se ``rellenan'' estas referencias. 
+% Por eso hay que compilar dos veces tu memoria.
+% Si no, no se crearán las referencias.
+
+
+
+%  \begin{figure}
+%     \centering
+%     \includegraphics[bb=0 0 800 600, width=12cm, keepaspectratio]{img/foro1}
+%     \caption{Página con enlaces a hilos}
+%     \label{figura:foro_hilos}
+%  \end{figure}
+
+
+% A continuación un bloque ``verbatim'', que se utiliza para mostrar texto tal cual.
+% Se puede utilizar para ofrecer el contenido de correos electrónicos, código, entre otras cosas.
+
+
+% {\footnotesize
+% \begin{verbatim}
+%     From gaurav at gold-solutions.co.uk  Fri Jan 14 14:51:11 2005
+%     From: gaurav at gold-solutions.co.uk (gaurav_gold)
+%     Date: Fri Jan 14 19:25:51 2005
+%     Subject: [Mailman-Users] mailman issues
+%     Message-ID: <003c01c4fa40$1d99b4c0$94592252@gaurav7klgnyif>
+
+%     Dear Sir/Madam,
+%     How can people reply to the mailing list?  How do i turn off
+%     this feature? How can i also enable a feature where if someone
+%     replies the newsletter the email gets deleted?
+%     Thanks
+
+%     From msapiro at value.net  Fri Jan 14 19:48:51 2005
+%     From: msapiro at value.net (Mark Sapiro)
+%     Date: Fri Jan 14 19:49:04 2005
+%     Subject: [Mailman-Users] mailman issues
+%     In-Reply-To: <003c01c4fa40$1d99b4c0$94592252@gaurav7klgnyif>
+%     Message-ID: <PC173020050114104851057801b04d55@msapiro>
+
+%     gaurav_gold wrote:
+%     >How can people reply to the mailing list?  How do i turn off
+%     this feature? How can i also enable a feature where if someone
+%     replies the newsletter the email gets deleted?
+
+%     See the FAQ
+%     >Mailman FAQ: http://www.python.org/cgi-bin/faqw-mm.py
+%     article 3.11
+% \end{verbatim}
+% }
+
+
+
+\section{Estructura de la memoria}
+\label{sec:estructura}
+
+Esta memoria se estructura de la siguiente manera:
+
+\begin{itemize}
+    \item \textbf{Capítulo 1, Introducción:} Se presenta el contexto general del trabajo, las motivaciones que lo impulsan, el objetivo principal del proyecto y la aportación que supone Code-XR en el ámbito de la visualización de métricas de software. Además, se ofrece una descripción general de la herramienta y una guía sobre la estructura del documento.
+    \item \textbf{Capítulo 2, Objetivos y planificación:} Se detallan los objetivos generales y específicos del proyecto, así como la planificación temporal seguida para su desarrollo, incluyendo una visión de los hitos principales y la metodología empleada.
+    \item \textbf{Capítulo 3, Estado del arte:} Se analiza el estado del arte en visualización de software, con especial énfasis en técnicas inmersivas y herramientas previas relevantes. Se revisan también los enfoques más comunes para la representación de métricas estructurales en entornos de desarrollo.
+    \item \textbf{Capítulo 4, Diseño e implementación:} Se describe el diseño e implementación de Code-XR, incluyendo su arquitectura, los componentes principales de la herramienta, las decisiones técnicas adoptadas y los diferentes modos de visualización que ofrece.
+    \item \textbf{Capítulo 5, Validación del prototipo:} Se exponen los experimentos realizados para validar el prototipo, incluyendo los escenarios de prueba, los criterios de evaluación empleados y la documentación del comportamiento observado durante su uso en proyectos reales.
+    \item \textbf{Capítulo 6, Resultados:} Se recogen los resultados obtenidos tras la evaluación, valorando en qué medida se han cumplido los objetivos propuestos y analizando las ventajas y limitaciones del enfoque adoptado.
+    \item \textbf{Capítulo 7, Conclusiones y líneas futuras:} Se presentan las conclusiones generales del trabajo, se reflexiona sobre el aprendizaje obtenido durante el desarrollo del proyecto y se plantean posibles líneas de mejora o extensión futura de Code-XR.
+    \item \textbf{Apéndices y bibliografía:} La memoria se complementa con un apéndice que incluye un manual de uso de la herramienta, así como la bibliografía consultada a lo largo
+\end{itemize}
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=9cm, keepaspectratio]{img/arquitectura.png}
+%   \caption{Estructura del parser básico}
+%   \label{fig:arquitectura}
+% \end{figure}
+
+
+
+
+% En esta sección se debería introducir la estructura de la memoria. 
+
+% Así:
+
+
+% \begin{itemize}
+%   \item En el primer capítulo se hace una intro al proyecto.
+  
+%   \item En el capítulo~\ref{chap:objetivos} (ojo, otra referencia automática) se muestran los objetivos del proyecto.
+  
+%   \item A continuación se presenta el estado del arte en el capítulo~\ref{chap:estado}.
+  
+%   \item \ldots
+% \end{itemize}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% OBJETIVOS %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\cleardoublepage % empezamos en página impar
+\chapter{Objetivos} % título del capítulo (se muestra)
+\label{chap:objetivos} % identificador del capítulo (no se muestra, es para poder referenciarlo)
+
+% \section{Objetivo general} % título de sección (se muestra)
+% \label{sec:objetivo-general} % identificador de sección (no se muestra, es para poder referenciarla)
+
+% Aquí vendría el objetivo general en una frase:
+% Mi trabajo fin de grado consiste en crear de una herramienta de análisis de los comentarios jocosos en repositorios de software libre alojados en la plataforma GitHub.
+
+% Recuerda que los objetivos siempre vienen en infinitivo.
+
+\section{Objetivo general}
+\label{sec:objetivo-general}
+
+El objetivo principal de este trabajo es desarrollar una herramienta de visualización de métricas de código en tiempo real, integrada en Visual Studio Code a modo de plugin usando tecnologías de realidad extendida (XR), que facilite la comprensión estructural del software durante el desarrollo.
+
+El propósito es ofrecer una solución ligera, accesible y adaptable, capaz de representar propiedades clave del código como tamaño, complejidad o estructura jerárquica mediante metáforas visuales tridimensionales. Esta herramienta debe proporcionar retroalimentación continua sin abandonar el flujo de trabajo habitual del programador, fomentando así un análisis más intuitivo y dinámico de la calidad del software.
+
+\section{Objetivos específicos}
+\label{sec:objetivos-especificos}
+
+Además del objetivo general, el desarrollo de Code-XR plantea una serie de objetivos específicos orientados a dotar a la herramienta de funcionalidades concretas y mejorar su aplicabilidad en entornos reales de desarrollo. Estos objetivos se resumen a continuación:
+
+\begin{itemize}
+    \item \textbf{Diseñar una arquitectura modular para la extensión:} Establecer una estructura interna clara y escalable que permita añadir fácilmente nuevos lenguajes, métricas o modos de visualización sin modificar el núcleo del sistema.
+    \item \textbf{Implementar un sistema de análisis estático de código:} Desarrollar un conjunto de scripts en Python que, utilizando la librería Lizard~\cite{lizard}, extraigan métricas relevantes como líneas de código, número de parámetros y complejidad ciclomática a partir de archivos individuales o directorios completos.
+    \item \textbf{Desarrollar una visualización 3D inmersiva con BabiaXR:} Construir una interfaz gráfica basada en BabiaXR, A-Frame y WebXR que represente los elementos del código como edificios dentro de una ciudad tridimensional. Esta interfaz debe soportar interacción en tiempo real, diferentes estilos visuales y ser accesible desde navegador o dispositivos XR.
+    \item \textbf{Establecer comunicación en tiempo real mediante servidor local:} Lanzar un servidor HTTPS que gestione las peticiones de análisis y envíe los datos al cliente visual usando Server-Sent Events (SSE), permitiendo una actualización continua del modelo 3D sin necesidad de recargar la vista manualmente.
+    \item \textbf{Integrar Code-XR dentro del entorno Visual Studio Code:} Utilizar la API oficial de VS Code para proporcionar comandos, menús contextuales y vistas personalizadas que permitan al usuario ejecutar el análisis y acceder a las visualizaciones sin abandonar el editor.
+    \item \textbf{Ofrecer múltiples modos de visualización complementarios:} Desarrollar tres formas de explorar las métricas extraídas:
+    \begin{itemize}
+        \item \textbf{LivePanel}, un panel 2D con métricas detalladas.
+        \item \textbf{XR Mode}, escenarios 3D accesibles vía navegador o dispositivos XR a través de localhost.
+        \item \textbf{DOM Mode}, una vista específica para estructuras HTML en entornos web.
+    \end{itemize}
+    \item \textbf{Validar la herramienta en proyectos reales de software:} Aplicar Code-XR a repositorios reales con distintos lenguajes y estructuras, con el fin de comprobar su utilidad práctica, detectar patrones complejos y obtener retroalimentación sobre su usabilidad.
+\end{itemize}
+
+
+\section{Planificación temporal}
+\label{sec:planificacion-temporal}
+
+Este Trabajo Fin de Grado lo he desarrollado a lo largo de aproximadamente seis meses, compaginándolo con cinco asignaturas del segundo cuatrimestre. Debido a esta carga académica, la mayor parte del trabajo se concentró en fines de semana, festivos y semanas sin clases. A continuación, detallo cómo ha sido la planificación temporal real del proyecto:
+
+\begin{description}
+    \item[Enero de 2025:] El 22 de enero, tras finalizar el examen de la asignatura \textit{Laboratorio de Bases de Datos}, mi profesor David Moreno Lumbreras me propuso la posibilidad de realizar el TFG con él. Aunque inicialmente no tenía previsto hacer el TFG ese curso, unos días después decidí escribirle para conocer mejor las posibles temáticas. El 24 de enero inicié el contacto formal por correo electrónico, y a finales de mes mantuvimos una primera reunión online para hablar sobre distintas líneas de trabajo.
+
+    \item[Febrero de 2025:] Durante este mes valoré varias propuestas que me ofreció mi tutor. El 13 de febrero le escribí indicándole las tres ideas que más me interesaban y le propuse una reunión presencial para discutirlas en profundidad. Entre ellas estaba la opción de crear un plugin para Visual Studio Code, que me atrajo especialmente por ser el editor que he utilizado durante toda la carrera y por el reto de aprender nuevas tecnologías.
+
+    \item[Marzo de 2025:] El 4 de marzo me decidí finalmente por la opción de desarrollar un plugin para Visual Studio Code, y ese mismo día acordamos celebrar una reunión presencial para definir los primeros pasos del proyecto. La reunión se programó para el 12 de marzo.
+
+    Durante los días previos, estuve explorando cómo funcionan las extensiones de VS Code y desarrollé pequeños plugins de prueba. El 11 de marzo creé el repositorio de Code-XR y construí una primera versión muy básica del plugin, que lanzaba un servidor HTTP con una escena generada a partir de una plantilla sencilla usando A-Frame.
+
+    En la reunión del día 12 presenté esa versión inicial y, a partir de ella, definimos los cuatro pilares fundamentales del TFG. El primero fue implementar el soporte para servidores HTTPS, necesario para que las escenas pudieran visualizarse correctamente en dispositivos de realidad virtual por motivos de seguridad. También se acordó la integración con BabiaXR y el desarrollo del sistema de análisis de métricas, centrado inicialmente en calcular la complejidad ciclomática (CCN), las líneas de código (LOC) y el número de funciones, entre otras. La figura~\ref{fig:reunion-marzo} muestra una imagen de dicha reunión, donde quedaron recogidos los puntos principales del proyecto.
+
+        
+    \item[Abril de 2025:] Entre el 3 y el 10 de abril implementé la funcionalidad para analizar ficheros de código, configurando entornos virtuales en Python y utilizando la librería Lizard para extraer métricas como líneas de código, parámetros y complejidad ciclomática. También desarrollé el modo LivePanel para visualizar estos datos en una interfaz 2D, como paso previo a la visualización en XR. El día 10 publiqué oficialmente el proyecto bajo el nombre Code-XR.\\
+    Durante la Semana Santa (del 10 al 20 de abril), me centré en una de las funcionalidades clave del proyecto: el análisis en activo. Implementé un servidor local con Server-Sent Events (SSE) que actualiza automáticamente las métricas en cuanto se detectan cambios en el código. También apliqué esta funcionalidad al modo LivePanel.
+
+    \item[Mayo de 2025:] Durante este mes no trabajé activamente en el proyecto debido a los exámenes finales de las asignaturas del cuatrimestre.
+
+    \item[Junio de 2025:] Retomé el trabajo del 20 al 23 de junio, añadiendo una nueva funcionalidad: VisualizeDOM, que permite representar la jerarquía DOM de un archivo HTML mediante el componente babia-html.
+
+    \item[Julio de 2025:] Durante el mes de julio desarrollé el análisis de directorios completos, tanto en modo XR como en modo LivePanel, con la opción de exploración profunda (deep) o superficial. Además, mejoré varias funcionalidades ya existentes:
+    \begin{itemize}
+        \item Permití seleccionar el gráfico BabiaXR a utilizar en cada análisis.
+        \item Añadí opciones de configuración avanzadas en cada sección (lanzamiento de servidores, ver datos de un json de usuario y análisis de ficheros o directorios).
+        \item Incorporé perfiles personalizados para guardar y reutilizar configuraciones.
+        \item Soporte oficial para todos los lenguajes de programación soportados por Lizard.
+        \item Mejoras varias como en la interfaz gráfica u otros aspectos técnicos.
+    \end{itemize}
+    Finalmente, el 29 de julio publiqué la versión 1.0.0 de Code-XR y creé la página web oficial del proyecto~\cite{montes2025web}, donde se incluyen vídeos demostrativos, una guía rápida de instalación y documentación completa sobre el funcionamiento del plugin.
+\end{description}
+
+Cabe destacar que muchas de estas tareas se solaparon en el tiempo, y que el ritmo de trabajo se adaptó a mi disponibilidad. Las reuniones con mi tutor se celebraron cuando era posible, en función del avance y del calendario académico.
+
+% TODO: Diagrama de Gantt de Code-XR
+% \begin{figure}[H]
+%     ... (aquí iría el diagrama de Gantt en el futuro) ...
+% \end{figure}
+
+\begin{center}
+    \fbox{\parbox{0.8\textwidth}{\centering \textbf{TODO: Diagrama de Gantt de Code-XR}}}
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/reunion_2025-03-12.png}
+    \caption{Imagen de la reunión del 12 de marzo de 2025, donde se definieron los puntos principales del TFG.}
+    \label{fig:reunion-marzo}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ESTADO DEL ARTE %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\cleardoublepage
+\chapter{Estado del arte}
+\label{chap:estado}
+
+\section{Visual Studio Code y su sistema de extensiones}
+\label{sec:vscode}
+
+Visual Studio Code (VS Code) es un editor de código fuente desarrollado por Microsoft, ampliamente utilizado por la comunidad de desarrolladores debido a su ligereza, extensibilidad y compatibilidad con múltiples lenguajes de programación. Desde su lanzamiento, ha ganado una gran popularidad gracias a características como el autocompletado inteligente, el depurador integrado, la integración con Git y su ecosistema de extensiones.
+
+Una de las características más potentes de VS Code es su sistema de extensiones, que permite ampliar las funcionalidades del editor mediante plugins desarrollados en tecnologías web, principalmente TypeScript, JavaScript, HTML y CSS. Estas extensiones pueden interactuar directamente con el entorno mediante la API oficial de VS Code~\cite{vscode-api}, la cual expone funcionalidades como el acceso al árbol de archivos, la edición del contenido de los documentos, la creación de paneles personalizados, la ejecución de comandos o la escucha de eventos internos del editor.
+
+En el contexto de este Trabajo Fin de Grado, he empleado VS Code no solo como entorno principal de desarrollo, sino también como plataforma de despliegue para la herramienta desarrollada: Code-XR. La elección de esta plataforma ha respondido tanto a motivos técnicos como personales. Por un lado, el ecosistema de extensiones de VS Code permite integrar la visualización de métricas directamente en el entorno de trabajo del programador, lo que evita saltos de contexto y mejora la fluidez del análisis. Por otro lado, se trata del editor que he utilizado a lo largo de toda mi formación universitaria, lo que favorece una mayor familiaridad con su interfaz y flujo de trabajo.
+
+Gracias al uso de la API de extensiones~\cite{vscode-api}, se han podido registrar comandos personalizados, interceptar eventos como la apertura o modificación de archivos y lanzar servidores locales para comunicar el análisis del código con las interfaces XR que forman parte del sistema. El diseño modular de VS Code y su modelo basado en eventos lo convierten en un entorno especialmente adecuado para prototipar herramientas como Code-XR, que requieren integración en tiempo real con el proceso de edición de código.
+
+\section{BabiaXR}
+\label{sec:babiaxr}
+
+BabiaXR~\cite{moreno2022babiaxr} es una plataforma de visualización tridimensional e inmersiva desarrollada por investigadores del Grupo de Sistemas y Comunicaciones (GSyC) de la Universidad Rey Juan Carlos (URJC). Está diseñada para facilitar la creación de escenas interactivas en realidad extendida (XR), incluyendo realidad virtual (VR)y aumentada (AR), utilizando tecnologías web abiertas y accesibles como A-Frame, Three.js y WebXR.
+
+El objetivo de BabiaXR es proporcionar un entorno modular y fácilmente integrable que permita a desarrolladores e investigadores visualizar información compleja de forma espacial, sin necesidad de conocimientos avanzados de gráficos 3D. Gracias a su arquitectura basada en componentes personalizables, BabiaXR permite representar datos estructurados como visualizaciones 3D interactivas, directamente desde el navegador y sin necesidad de instalar software adicional. Esto lo convierte en una herramienta especialmente útil en contextos educativos y científicos, donde la simplicidad de despliegue y la portabilidad son factores clave.
+
+En el contexto de este TFG, BabiaXR se ha utilizado como motor base para renderizar las visualizaciones XR de métricas de software generadas por el plugin Code-XR. Concretamente, se han empleado varios de sus componentes gráficos para representar las distintas métricas sobre ficheros o directorios.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/graficos_babiaxr.png}
+    \caption{Ejemplo de los diferentes gráficos de BabiaXR utilizados en Code-XR para la visualización de métricas.}
+    \label{fig:babiaxr-graficos}
+\end{figure}
+
+\section{A-Frame}
+\label{sec:aframe}
+
+A-Frame es un framework de código abierto desarrollado inicialmente por Mozilla, orientado a la creación de experiencias inmersivas de realidad virtual y aumentada directamente desde el navegador~\cite{aframe}. Su principal objetivo es reducir la complejidad del desarrollo de escenas 3D, ofreciendo una sintaxis declarativa basada en HTML que permite a los desarrolladores definir entornos tridimensionales mediante etiquetas comprensibles y reutilizables.
+
+Una de las principales ventajas de A-Frame es que se construye sobre Three.js, una biblioteca de bajo nivel para gráficos 3D en WebGL. Gracias a ello, A-Frame ofrece una capa de abstracción que simplifica el uso de luces, cámaras, geometrías y materiales, sin renunciar a la potencia gráfica que subyace bajo el capó. Además, A-Frame está diseñado de forma modular y extensible, lo que permite incorporar componentes personalizados y paquetes externos que enriquecen las capacidades básicas del framework.
+
+En el contexto de este TFG, A-Frame actúa como motor de visualización principal dentro del sistema de representación XR de Code-XR. Toda la escena 3D que se genera al lanzar un análisis con visualización inmersiva —ya sea en modo escritorio o mediante gafas de realidad virtual— está construida como una etiqueta \texttt{<a-scene>} de A-Frame. Dentro de esta escena, se cargan dinámicamente elementos como:
+
+\begin{itemize}
+    \item el entorno (\texttt{<a-entity environment=...>}),
+    \item los datos obtenidos del análisis (\texttt{<a-entity babia-queryjson=...>}),
+    \item los gráficos 3D (como \texttt{<a-entity chart-bar>} o \texttt{<a-entity chart-city>}),
+    \item los controladores para interacción con ratón o mandos XR (\texttt{laser-controls}, \texttt{raycaster}, etc.).
+\end{itemize}
+
+El sistema también incluye componentes como \texttt{movement-controls}, que permiten al usuario desplazarse libremente por la escena, y \texttt{cursor}, que habilita la interacción mediante puntero en modo escritorio. Esta estructura hace posible una experiencia inmersiva altamente personalizable, donde el usuario puede explorar las métricas del código como si caminara dentro de una ciudad tridimensional interactiva, cambiando parámetros o activando filtros en tiempo real.
+
+Además, se han utilizado extensiones adicionales como:
+
+\begin{itemize}
+    \item \textbf{aframe-extras}: para compatibilidad mejorada con mandos y controles de navegación,
+    \item \textbf{aframe-environment-component}: para construir entornos virtuales preconfigurados,
+    \item \textbf{aframe-geometry-merger-component}: para mejorar el rendimiento gráfico en escenas complejas.
+\end{itemize}
+
+Gracias a A-Frame, Code-XR consigue integrar visualización inmersiva XR basada en datos de análisis estático dentro del flujo de trabajo habitual del desarrollador, sin requerir instalaciones externas ni conocimientos especializados de gráficos 3D o motores complejos.
+
+
+\section{WebXR y Three.js}
+\label{sec:webxr-threejs}
+
+WebXR es un estándar impulsado por el World Wide Web Consortium (W3C) que proporciona una interfaz unificada para acceder a dispositivos de realidad virtual (VR) y aumentada (AR) desde navegadores web modernos~\cite{webxr}. Esta API permite detectar dispositivos compatibles —como gafas de realidad virtual, controladores de movimiento o sensores de orientación— y renderizar contenido inmersivo directamente en el navegador, sin necesidad de plugins o instalaciones adicionales.
+
+A diferencia de su predecesor, WebVR, el estándar WebXR está diseñado para cubrir tanto experiencias de realidad virtual como aumentada desde una misma API. Esto facilita el desarrollo de aplicaciones XR multiplataforma que funcionen de manera transparente en dispositivos como las Meta Quest, móviles compatibles con AR o incluso navegadores de escritorio. Gracias a WebXR, los entornos construidos con tecnologías web como A-Frame pueden ejecutarse en modo inmersivo y responder en tiempo real a la posición y orientación del usuario, ofreciendo una experiencia más natural e interactiva.
+
+Aunque WebXR no se ha utilizado de forma directa en el código de Code-XR, sí está presente en la infraestructura base proporcionada por BabiaXR y A-Frame. La capacidad de lanzar visualizaciones XR directamente desde el navegador, y que estas puedan ser exploradas en dispositivos VR, se apoya en el soporte nativo de WebXR ofrecido por las capas subyacentes. Esto permite que el usuario final, sin necesidad de configurar nada adicional, pueda sumergirse en una visualización tridimensional del código simplemente accediendo a una URL generada por el plugin.
+
+Por su parte, Three.js es una biblioteca JavaScript de alto nivel para el renderizado de gráficos 3D en WebGL~\cite{threejs}. Proporciona una interfaz sencilla para trabajar con cámaras, luces, materiales, geometrías y animaciones, y ha sido adoptada como base por muchos frameworks más accesibles como A-Frame. En otras palabras, Three.js actúa como el motor gráfico real que renderiza las escenas construidas en A-Frame, traduciéndolas a instrucciones de bajo nivel ejecutadas en la GPU mediante WebGL.
+
+Aunque en este proyecto tampoco se ha programado directamente sobre la API de Three.js, su papel como capa de renderizado es esencial para que Code-XR pueda mostrar métricas en forma de ciudades tridimensionales, edificios interactivos o jerarquías DOM navegables. Gracias a la madurez y optimización de Three.js, la visualización generada es fluida, compatible con múltiples navegadores y capaz de mantener el rendimiento incluso en escenas complejas con decenas o cientos de elementos renderizados.
+
+En resumen, tanto WebXR como Three.js son tecnologías que, aunque no se han utilizado directamente en el código fuente desarrollado, sustentan gran parte de las capacidades inmersivas y gráficas de Code-XR a través de BabiaXR y A-Frame, y son piezas clave del ecosistema web XR moderno.
+
+
+\section{HTML}
+\label{sec:html}
+
+HTML (HyperText Markup Language) es el lenguaje de marcado fundamental para la estructuración de contenido en la web~\cite{html}. En el contexto de Code-XR, HTML actúa como la base común sobre la que se construyen todas las interfaces visuales de la herramienta, independientemente del modo de análisis utilizado: ya sea LivePanel, XR Mode o VisualizeDOM.
+
+Cada vez que el usuario lanza un análisis, el sistema genera dinámicamente una plantilla HTML que se adapta al modo de visualización elegido. Estas plantillas incluyen la carga de scripts, componentes gráficos, referencias a los datos analizados y configuraciones específicas para el entorno XR o la interfaz 2D. Además, todas estas interfaces se sirven desde un servidor local (localhost), lo que permite que el usuario pueda abrirlas tanto en el navegador como desde un panel dentro del propio Visual Studio Code.
+
+En el caso del modo LivePanel, HTML organiza la presentación de métricas en tablas, tarjetas o paneles interactivos, facilitando una exploración clásica y accesible de la información. Para el modo XR, el documento HTML contiene la escena tridimensional definida mediante A-Frame, donde los elementos \texttt{<a-scene>} y \texttt{<a-entity>} representan funciones o archivos del proyecto como estructuras visuales. En el modo VisualizeDOM, el contenido de un fichero HTML es analizado y su estructura DOM se representa como un árbol navegable en 3D, también dentro de una plantilla HTML generada.
+
+La principal ventaja de utilizar HTML como base es su versatilidad y compatibilidad con el ecosistema web, lo que permite incorporar fácilmente bibliotecas, componentes personalizados y sistemas de interacción. Esta modularidad ha permitido a Code-XR mantener una arquitectura visual consistente, reutilizable y expandible, capaz de adaptarse a distintos modos de visualización sin cambiar la infraestructura técnica subyacente.
+
+\section{TypeScript y JavaScript}
+\label{sec:typescript-javascript}
+
+TypeScript es un lenguaje de programación desarrollado por Microsoft que extiende JavaScript con tipado estático opcional y características orientadas a objetos~\cite{typescript}. Se compila a JavaScript y es especialmente útil para desarrollar aplicaciones a gran escala. En el caso de Code-XR, TypeScript actúa como el motor principal del plugin para Visual Studio Code, gestionando tanto la lógica de control como la interacción con la API del editor.
+
+Gracias a su sistema de tipos y su compatibilidad con las definiciones de la API oficial de VS Code, TypeScript permite escribir un código más robusto, mantenible y fácilmente depurable. En este TFG, se ha utilizado para estructurar los comandos del plugin, gestionar los flujos de análisis de ficheros o directorios, lanzar servidores locales, y registrar las distintas vistas disponibles (LivePanel, XR Mode, VisualizeDOM). También se encarga de orquestar cuándo y cómo se genera cada visualización, y de enviar los datos de análisis a las interfaces correspondientes.
+
+Por su parte, JavaScript ha sido el lenguaje utilizado en la parte cliente (frontend) de la herramienta, desempeñando un papel fundamental en la actualización dinámica de las visualizaciones~\cite{javascript}. En particular, es el encargado de implementar el sistema de comunicación en tiempo real mediante Server-Sent Events (SSE). Cada vez que se detecta un cambio en el código fuente, el backend (escrito en TypeScript) actualiza el análisis y envía los datos mediante SSE, que son recibidos en el cliente JavaScript para actualizar la vista correspondiente.
+
+En el caso concreto del modo LivePanel, JavaScript también es responsable de inyectar dinámicamente el contenido HTML que representa las métricas del análisis. Esto incluye la creación y actualización de elementos visuales como tarjetas, tablas o gráficos, en función de los datos recibidos. Gracias a esta lógica dinámica, la vista LivePanel puede reaccionar de forma instantánea a los cambios sin necesidad de recargar la página ni ejecutar ningún código adicional por parte del usuario.
+
+La combinación de TypeScript para el control lógico del plugin y JavaScript para la actualización dinámica del frontend ha permitido construir una herramienta modular, eficiente y altamente interactiva. Ambos lenguajes forman parte del ecosistema web moderno y ofrecen un equilibrio ideal entre rendimiento, facilidad de desarrollo y mantenibilidad del código.
+
+\section{CSS}
+\label{sec:css}
+
+CSS (Cascading Style Sheets) es el lenguaje estándar utilizado para definir la presentación visual de documentos HTML~\cite{css}. Permite aplicar estilos a elementos web como colores, fuentes, márgenes, disposición de contenido o animaciones. En el contexto de Code-XR, CSS se utiliza exclusivamente para dar estilo a las interfaces generadas en el modo LivePanel, es decir, en las visualizaciones bidimensionales de métricas de código.
+
+Cuando el usuario selecciona este modo de análisis, el sistema genera dinámicamente una plantilla HTML que contiene las métricas estructurales del código, como líneas de código, complejidad ciclomática o número de parámetros. Es en esa plantilla donde CSS entra en juego para mejorar la presentación de los datos y facilitar su interpretación. Por ejemplo, se utiliza para definir colores distintivos según la complejidad, organizar tarjetas o bloques métricos en una disposición clara, y aplicar estilos adaptativos que permitan visualizar correctamente la información en distintos tamaños de ventana.
+
+Aunque CSS no participa en los modos inmersivos XR ni en la representación tridimensional del DOM, sí cumple un rol importante en la experiencia de usuario cuando se elige una visualización 2D. Gracias a su separación respecto a la lógica de análisis (TypeScript) y de comunicación (JavaScript), el uso de CSS ha permitido mantener una arquitectura limpia y modular, en la que el estilo puede modificarse de forma independiente sin afectar al funcionamiento interno del plugin.
+
+\section{Python y Lizard}
+\label{sec:python-lizard}
+
+Python es un lenguaje de programación de alto nivel, ampliamente utilizado en tareas de automatización, análisis de datos y procesamiento de texto~\cite{python}. En el marco de este proyecto, Python ha sido la tecnología seleccionada para realizar el análisis estático del código fuente, es decir, para extraer métricas estructurales que luego son representadas visualmente en los distintos modos de Code-XR.
+
+La elección de Python responde a su sencillez sintáctica, su ecosistema de bibliotecas bien establecido y su capacidad para integrarse fácilmente con otros entornos. En este caso, la ejecución de los scripts de análisis se lanza desde el backend del plugin, escrito en TypeScript, mediante servidores locales. Estos scripts procesan ficheros o directorios del proyecto analizado y generan como salida un fichero JSON con las métricas calculadas.
+
+Para calcular métricas como la complejidad ciclomática (CCN), el número de líneas de código (LOC) o el número de funciones o métodos, se ha utilizado la herramienta Lizard~\cite{lizard}, una biblioteca de análisis estático especializada y compatible con múltiples lenguajes de programación. Lizard permite procesar archivos fuente y devolver una representación estructurada de sus componentes, lo que ha facilitado la integración directa con el sistema de visualización de Code-XR.
+
+Los datos generados por los scripts de Python son consumidos tanto por el modo LivePanel, que los muestra en formato 2D, como por el modo XR, donde se representan como edificios o elementos tridimensionales en una ciudad metafórica. En ambos casos, la estructura JSON permite mapear propiedades del código (como tamaño o complejidad) a atributos visuales como altura, color o volumen.
+
+Además, en el modo VisualizeDOM, Python también cumple una función complementaria: leer el contenido del archivo HTML seleccionado y convertirlo a una cadena de texto. Esta cadena se pasa directamente al componente \texttt{babia-html} de BabiaXR, que se encarga de interpretarla y generar la visualización tridimensional correspondiente.
+
+En conjunto, la combinación de Python y Lizard proporciona una base sólida para la obtención de datos estáticos fiables y bien estructurados, esenciales para alimentar las visualizaciones generadas por Code-XR en todos sus modos de funcionamiento.
+
+\section{Gafas de Realidad Virtual: Meta Quest 3}
+\label{sec:meta-quest-3}
+
+Para probar y validar las funcionalidades inmersivas del plugin Code-XR, se han utilizado unas gafas de realidad virtual Meta Quest 3, cedidas temporalmente por la Universidad Rey Juan Carlos. Estos dispositivos permiten ejecutar experiencias de realidad virtual de forma autónoma, gracias a su procesador integrado, sensores de movimiento y capacidad de renderizado gráfico sin necesidad de conexión a un ordenador externo.
+
+Durante el desarrollo, las Meta Quest 3 se han empleado para acceder directamente a las visualizaciones XR generadas por Code-XR, conectándose al servidor local lanzado desde el entorno de desarrollo. Esto ha permitido verificar en entorno real el correcto funcionamiento del modo XR, evaluar la experiencia de usuario y realizar ajustes en la navegación, disposición de los gráficos y rendimiento general de la escena.
+
+El uso de estos dispositivos ha sido clave para validar el comportamiento del sistema en condiciones reales de uso inmersivo, especialmente en lo que respecta a la integración con WebXR y la capacidad de renderizar métricas complejas de código en escenarios tridimensionales navegables.
+
+
+\section{Apoyo de herramientas de inteligencia artificial}
+\label{sec:ia}
+
+Durante el desarrollo del proyecto se ha utilizado el apoyo de herramientas basadas en inteligencia artificial, que han resultado útiles como complemento para resolver dudas técnicas, explorar alternativas de implementación y aprender nuevas tecnologías necesarias para llevar a cabo el trabajo.
+
+En particular, ChatGPT~\cite{chatgpt} ha sido una herramienta de referencia para comprender el funcionamiento de bibliotecas como Lizard (usada para el análisis estático de código) o A-Frame (empleada en la construcción de escenas XR). También ha servido como apoyo a la hora de encontrar enfoques para resolver problemas concretos, mejorar la organización de ciertas secciones del código o redactar documentación técnica con un enfoque más claro y estructurado.
+
+Por otro lado, se ha recurrido a Claude 4~\cite{claude4} para tareas relacionadas con la organización de grandes volúmenes de código. Esto ha sido especialmente útil en este proyecto, cuyo repositorio cuenta con más de 200 ficheros solo en la carpeta \texttt{src/}, sin contar plantillas HTML, archivos CSS o scripts JavaScript asociados.
+
+Estas herramientas no sustituyen el conocimiento técnico ni el razonamiento propio, pero sí han aportado valor como apoyo al desarrollo, ayudando a mejorar la eficiencia y la claridad en distintas partes del proyecto.
+% Descripción de las tecnologías que utilizas en tu trabajo. 
+% Con dos o tres párrafos por cada tecnología, vale. 
+% Se supone que aquí viene todo lo que no has hecho tú.
+
+% Puedes citar libros, como el de Bonabeau et al., sobre procesos estigmérgicos~\cite{bonabeau:_swarm}. 
+% Me encantan los procesos estigmérgicos.
+% Deberías leer más sobre ellos.
+% Pero quizás no ahora, que tenemos que terminar la memoria para sacarnos por fin el título.
+% Nota que el \~ \ añade un espacio en blanco, pero no deja que exista un salto de línea. 
+% Imprescindible ponerlo para las citas.
+
+% Citar es importantísimo en textos científico-técnicos. 
+% Porque no partimos de cero.
+% Es más, partir de cero es de tontos; lo suyo es aprovecharse de lo ya existente para construir encima y hacer cosas más sofisticadas.
+% ¿Dónde puedo encontrar textos científicos que referenciar?
+% Un buen sitio es Google Scholar\footnote{\url{http://scholar.google.com}}.
+% Por ejemplo, si buscas por ``stigmergy libre software'' para encontrar trabajo sobre software libre y el concepto de \emph{estigmergia} (¿te he comentado que me gusta el concepto de estigmergia ya?), encontrarás un artículo que escribí hace tiempo cuyo título es ``Self-organized development in libre software: a model based on the stigmergy concept''.
+% Si pulsas sobre las comillas dobles (entre la estrella y el ``citado por ...'', justo debajo del extracto del resumen del artículo, te saldrá una ventana emergente con cómo citar.
+% Abajo a la derecha, aparece un enlace BibTeX.
+% Púlsalo y encontrarás la referencia en formato BibTeX, tal que así:
+
+% {\footnotesize
+% \begin{verbatim}
+% @inproceedings{robles2005self,
+%   title={Self-organized development in libre software:
+%          a model based on the stigmergy concept},
+%   author={Robles, Gregorio and Merelo, Juan Juli\'an 
+%           and Gonz\'alez-Barahona, Jes\'us M.},
+%   booktitle={ProSim'05},
+%   year={2005}
+% }
+% \end{verbatim}
+% }
+
+% Copia el texto en BibTeX y pégalo en el fichero \texttt{memoria.bib}, que es donde están las referencias bibliográficas.
+% Para incluir la referencia en el texto de la memoria, deberás citarlo, como hemos hecho antes con~\cite{bonabeau:_swarm}, lo que pasa es que en vez de el identificador de la cita anterior (bonabeau:\_swarm), tendrás que poner el nuevo (robles2005self).
+% Compila el fichero \texttt{memoria.tex} (\texttt{pdflatex memoria.tex}), añade la bibliografía (\texttt{bibtex memoria.aux}) y vuelve a compilar \texttt{memoria.tex} (\texttt{pdflatex memoria.tex})\ldots y \emph{voilà} ¡tenemos una nueva cita~\cite{robles2005self}!
+
+% También existe la posibilidad de poner notas al pie de página, por ejemplo, una para indicarte que visite la página del GSyC\footnote{\url{http://gsyc.es}}.
+
+
+
+% \section{Sección 1} 
+% \label{sec:seccion1}
+
+% Hemos hablado de cómo incluir figuras.
+% Pero no hemos dicho nada de tablas.
+% A mí me gustan las tablas.
+% Mucho.
+% Aquí un ejemplo de tabla, la Tabla~\ref{tab:ejemplo} (siento ser pesado, pero nota cómo he puesto la referencia).
+
+% \begin{table}
+%  \begin{center}
+%   \begin{tabular}{ | l | c | r |} % tenemos tres colummnas, la primera alineada a la izquierda (l
