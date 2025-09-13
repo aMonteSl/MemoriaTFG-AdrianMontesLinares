@@ -53,6 +53,9 @@
 % En el preámbulo
 \usepackage{xparse}
 
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+
 % Redefinir \texttt para permitir saltos automáticos
 \let\oldtexttt\texttt
 \RenewDocumentCommand{\texttt}{m}{%
@@ -831,28 +834,28 @@ A continuación se presenta un resumen cronológico de las versiones principales
 \section{Primeros pasos}
 \label{sec:primeros-pasos}
 
-Esta sección presenta las decisiones técnicas iniciales para crear la extensión de VS Code. Se siguió el tutorial oficial\cite{tutorialVSCode} y recursos complementarios\cite{vscode-youtube}, utilizando el generador ``Yo Code''\cite{yo-code} para establecer las bases del proyecto.
+Esta sección presenta las decisiones técnicas iniciales para crear la extensión de VS Code. Se siguió el tutorial oficial~\cite{tutorialVSCode} y recursos complementarios~\cite{vscode-youtube}, utilizando el generador ``Yo Code''~\cite{yo-code} para establecer las bases del proyecto.
 
 \subsection{Generador \emph{Yo Code}}
 El generador oficial ``Yo Code'' configura la plantilla inicial mediante preguntas sobre identificador, descripción, lenguaje de desarrollo (TypeScript/JavaScript), repositorio Git y tipo de empaquetado (\emph{unbundled}, Webpack, Esbuild). Estas decisiones configuran la estructura base y scripts de compilación.
 
 \subsection{Elección de lenguaje}
-Se eligió \textbf{TypeScript} por su tipado estático, integración directa con la API de VS Code y mejor mantenibilidad en proyectos complejos\cite{typescript}. Permitió la evolución segura de Code-XR al crecer en ficheros y complejidad.
+Se eligió \textbf{TypeScript} por su tipado estático, integración directa con la API de VS Code y mejor mantenibilidad en proyectos complejos~\cite{typescript}. Permitió la evolución segura de Code-XR al crecer en ficheros y complejidad.
 
 \subsection{Bundlers}
-El empaquetado puede realizarse de distintas formas según las necesidades del proyecto\cite{vscode-bundling}:
+El empaquetado puede realizarse de distintas formas según las necesidades del proyecto~\cite{vscode-bundling}:
 \begin{itemize}
   \item \textbf{Unbundled}: sin bundler, prototipado rápido pero distribución manual de dependencias.
-  \item \textbf{Webpack}: bundler establecido, genera paquete único y minimiza dependencias\cite{webpack}.
-  \item \textbf{Esbuild}: bundler moderno con compilación extremadamente rápida\cite{esbuild}.
+  \item \textbf{Webpack}: bundler establecido, genera paquete único y minimiza dependencias~\cite{webpack}.
+  \item \textbf{Esbuild}: bundler moderno con compilación extremadamente rápida~\cite{esbuild}.
 \end{itemize}
 
 Code-XR comenzó con \emph{unbundled} para prototipado rápido, migrando posteriormente a \textbf{Webpack} para mayor fiabilidad y resolver advertencias de \texttt{npm} por tamaño excesivo en el empaquetado \texttt{.vsix}.
 
 \subsection{Archivo \texttt{package.json} (manifiesto de la extensión)}
-El \texttt{package.json} es el manifiesto central con metadatos del Marketplace, compatibilidad con VS Code y configuración de compilación. La sección \texttt{contributes} define los elementos de interfaz: +40 comandos, vista \texttt{codexrTree} y menús contextuales\cite{vscode-bundling}.
+El \texttt{package.json} es el manifiesto central con metadatos del Marketplace, compatibilidad con VS Code y configuración de compilación. La sección \texttt{contributes} define los elementos de interfaz: +40 comandos, vista \texttt{codexrTree} y menús contextuales~\cite{vscode-bundling}.
 
-Code-XR utiliza activación ansiosa (lista vacía en \texttt{activationEvents}) para garantizar disponibilidad inmediata de menús y vistas. La iconografía combina \emph{Codicons}\cite{codicons} oficiales, iconos \emph{Devicon}\cite{devicon} para representación de ficheros, y logotipo personalizado generado con IA.
+Code-XR utiliza activación ansiosa (lista vacía en \texttt{activationEvents}) para garantizar disponibilidad inmediata de menús y vistas. La iconografía combina \emph{Codicons}~\cite{codicons} oficiales, iconos \emph{Devicon}~\cite{devicon} para representación de ficheros, y logotipo personalizado generado con IA.
 
 \subsection{Archivo \texttt{extension.ts}}
 Implementa la lógica del manifiesto como punto de entrada con dos funciones principales:
@@ -873,7 +876,7 @@ Los comandos conectan acciones de usuario con lógica interna: declaración en \
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\linewidth]{img/fig-extension-structure.png}
+\includegraphics[width=0.60\linewidth]{img/fig-extension-structure.png}
 \caption{Relación entre los componentes clave de una extensión VS Code en Code-XR.}
 \label{fig:extension-structure}
 \end{figure}
@@ -883,9 +886,9 @@ Los comandos conectan acciones de usuario con lógica interna: declaración en \
 \section{Sprint 1 — Lanzamiento de servidores locales}
 \label{sec:sprint-servers}
 
-Este sprint estableció la capacidad fundamental de Code-XR para lanzar servidores locales, permitiendo servir visualizaciones XR desde el propio editor. La solución se inspiró en extensiones como \emph{Live Server}\cite{liveserver}, eliminando la necesidad de configurar servidores externos manualmente.
+Este sprint estableció la capacidad fundamental de Code-XR para lanzar servidores locales, permitiendo servir visualizaciones XR desde el propio editor. La solución se inspiró en extensiones como \emph{Live Server}~\cite{liveserver}, eliminando la necesidad de configurar servidores externos manualmente.
 
-El subsistema de servidores proporciona \textbf{arquitectura modular}, \textbf{persistencia de preferencias}, \textbf{multi-servidor concurrente}, \textbf{resolución automática de puertos}, \textbf{soporte HTTP/HTTPS completo} y \textbf{gestión centralizada de estado}. El diseño sigue patrones escalables con separación de responsabilidades y gestión automatizada del ciclo de vida\cite{code-xr}.
+El subsistema de servidores proporciona \textbf{arquitectura modular}, \textbf{persistencia de preferencias}, \textbf{multi-servidor concurrente}, \textbf{resolución automática de puertos}, \textbf{soporte HTTP/HTTPS completo} y \textbf{gestión centralizada de estado}. El diseño sigue patrones escalables con separación de responsabilidades y gestión automatizada del ciclo de vida~\cite{code-xr}.
 
 \subsection{Arquitectura modular del subsistema}
 El código se estructura en capas especializadas bajo \texttt{src/servers/} y \texttt{src/active\_servers/}, implementando una arquitectura de responsabilidades distribuidas:
@@ -929,13 +932,13 @@ label={fig:server-settings-json}]
 \end{figure}
 
 \subsection{Gestión inteligente de puertos y HTTP/HTTPS}
-El \texttt{PortManager} implementa descubrimiento automático mediante \texttt{get-port}\cite{get-port}, realizando búsqueda secuencial desde el puerto configurado hasta encontrar uno disponible. Ante colisiones, notifica transparentemente la reasignación.
+El \texttt{PortManager} implementa descubrimiento automático mediante \texttt{get-port}~\cite{get-port}, realizando búsqueda secuencial desde el puerto configurado hasta encontrar uno disponible. Ante colisiones, notifica transparentemente la reasignación.
 Se soporta HTTP y HTTPS (obligatorio para XR); en caso de intentar usar HTTPS con panel lateral, el plugin avisa y fuerza el uso de HTTP por limitaciones de VS Code.
 %Salto de linea
 
 El soporte HTTPS ofrece dos modalidades:
 \begin{itemize}
-  \item \textbf{Certificados por defecto}: Par \texttt{cert/key} incluido, generados con \texttt{OpenSSL}\cite{openssl}.
+  \item \textbf{Certificados por defecto}: Par \texttt{cert/key} incluido, generados con \texttt{OpenSSL}~\cite{openssl}.
   \item \textbf{Certificados personalizados}: Selector con validación de compatibilidad.
 \end{itemize}
 
@@ -987,7 +990,7 @@ Los servidores exponen endpoints \texttt{/events} con \emph{Server-Sent Events} 
 
 Este sprint estableció las capacidades de visualización XR completas de Code-XR mediante la integración con \textbf{BabiaXR}, motor de visualización 3D para todas las representaciones WebXR/AR/VR del plugin. El desarrollo siguió tres fases consecutivas para dominar la integración entre \textbf{BabiaXR}, \textbf{datos JSON} y el \textbf{plugin VS Code}, preparando el Sprint 3 de análisis en tiempo real.
 
-\textbf{Fase 1: Comprensión mediante ejemplos} — Galería de ejemplos predefinidos basados en BabiaXR\cite{babiaxr-examples} para familiarización con tipos de gráficos, configuración y estructuras de datos.
+\textbf{Fase 1: Comprensión mediante ejemplos} — Galería de ejemplos predefinidos basados en BabiaXR~\cite{babiaxr-examples} para familiarización con tipos de gráficos, configuración y estructuras de datos.
 
 \textbf{Fase 2: Pipeline JSON→XR} — Transformación automática de ficheros JSON en visualizaciones XR mediante análisis de estructura, mapeo de dimensiones y generación de plantillas HTML/A-Frame.
 
@@ -1011,7 +1014,7 @@ Todos reutilizan la infraestructura de servidores del Sprint 1, garantizando coh
 \subsection{Babia Examples}
 \label{sec:babia-examples}
 
-El subsistema \emph{Babia Examples} proporciona una galería interactiva de ejemplos predefinidos BabiaXR dentro de VS Code, facilitando el acceso inmediato a visualizaciones WebXR/AR/VR mediante un flujo de un clic. Permite explorar capacidades de BabiaXR, experimentar con diferentes gráficos y usar ejemplos como plantillas de referencia\cite{babiaxr-examples}.
+El subsistema \emph{Babia Examples} proporciona una galería interactiva de ejemplos predefinidos BabiaXR dentro de VS Code, facilitando el acceso inmediato a visualizaciones WebXR/AR/VR mediante un flujo de un clic. Permite explorar capacidades de BabiaXR, experimentar con diferentes gráficos y usar ejemplos como plantillas de referencia~\cite{babiaxr-examples}.
 
 Reutiliza la infraestructura de servidores del Sprint~\ref{sec:sprint-servers}, lanzando ejemplos según la configuración activa y registrándolos en \emph{Active Servers} para gestión centralizada.
 
@@ -1093,7 +1096,7 @@ Gestiona biblioteca personal de visualizaciones: escanea \texttt{globalStorage},
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.70\linewidth]{img/ui-visualize-data.png}
+\includegraphics[width=0.60\linewidth]{img/ui-visualize-data.png}
 \caption{Interfaz completa de \emph{Visualize Data} mostrando el flujo de trabajo paso a paso y la gestión de biblioteca de visualizaciones almacenadas.}
 \label{fig:ui-visualize-data}
 \end{figure}
@@ -1153,7 +1156,7 @@ Implementa flujo híbrido con webview personalizado integrando selector HTML5 na
 % Nombre sugerido: ui-color-picker-panel.png
 \begin{figure}[H]
 \centering
-\includegraphics[width=1\linewidth]{img/ui-color-picker-panel.png}
+\includegraphics[width=0.60\linewidth]{img/ui-color-picker-panel.png}
 \caption{Panel de selección de colores mediante webview integrado, utilizando el selector HTML5 nativo con validación en tiempo real.}
 \label{fig:ui-color-picker-panel}
 \end{figure}
@@ -1313,53 +1316,8 @@ La arquitectura está organizada en componentes especializados con responsabilid
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-  node distance=2cm and 2.5cm,
-  component/.style={rectangle, draw, fill=gray!10, minimum width=3.2cm, minimum height=1.2cm, align=center, font=\small},
-  manager/.style={rectangle, draw, fill=blue!10, minimum width=3.2cm, minimum height=1.2cm, align=center, font=\small},
-  engine/.style={rectangle, draw, fill=green!10, minimum width=3.2cm, minimum height=1.2cm, align=center, font=\small},
-  storage/.style={cylinder, draw, shape border rotate=90, fill=yellow!10, minimum width=2.5cm, minimum height=1.5cm, align=center, font=\small},
-  arrow/.style={thick,-latex, color=blue!60}
-]
-
-% Top layer - Main orchestrator
-\node[component] (orchestrator) {Analysis\\Orchestrator};
-
-% Second layer - Core engines
-\node[manager, below left=of orchestrator] (session) {Session\\Registry};
-\node[engine, below right=of orchestrator] (python) {Python\\Engine};
-
-% Third layer - Processing components
-\node[component, below=of session, xshift=-1.5cm] (require) {File Requirement\\Processor};
-\node[component, below=of session, xshift=1.5cm] (template) {Template\\Engine};
-
-% Fourth layer - Management components
-\node[manager, below=of python, xshift=-1.5cm] (watcher) {Session Watcher\\Manager};
-\node[manager, below=of python, xshift=1.5cm] (server) {Session Server\\Manager};
-
-% Bottom layer - Storage
-\node[storage, below=of template, yshift=-0.5cm] (config) {Configuration\\Storage};
-
-% Main orchestration connections
-\draw[arrow] (orchestrator) -- (session);
-\draw[arrow] (orchestrator) -- (python);
-
-% Session registry connections
-\draw[arrow] (session) -- (require);
-\draw[arrow] (session) -- (template);
-\draw[arrow] (session) -- (watcher);
-\draw[arrow] (session) -- (server);
-
-% Data flow connections
-\draw[arrow] (python) -- (template);
-\draw[arrow] (watcher) -- (python);
-\draw[arrow] (template) -- (server);
-
-% Configuration connection
-\draw[arrow] (config) -- (orchestrator);
-
-\end{tikzpicture}
-\caption{Arquitectura del subsistema de análisis mostrando los componentes principales y sus interacciones.}
+\includegraphics[width=0.20\linewidth]{img/arquitectura-subsistema-analisis.png}
+\caption{Arquitectura del subsistema de análisis mostrando los componentes principales y sus interacciones}
 \label{fig:arquitectura-analisis}
 \end{figure}
 
@@ -1393,9 +1351,9 @@ Secuencia básica que sigue un análisis en Code‑XR desde la petición del usu
 
 \begin{enumerate}
   \item \textbf{Petición del análisis.} Usuario solicita análisis mediante interfaz gráfica (clic derecho), menú rápido del plugin (\emph{Files by Language}/\emph{Project Structure}) o paleta de comandos (F1). Especifica tipo de análisis y objetivo (ruta al fichero/directorio).
-  
-  \item \textbf{Registro de la sesión.} Se crea sesión con identificador único (nonce) registrando: ruta \texttt{workspaceStorage}\cite{vscode-storage}, ficheros involucrados, tipo de análisis, estado y configuración.
-  
+
+  \item \textbf{Registro de la sesión.} Se crea sesión con identificador único (nonce) registrando: ruta \texttt{workspaceStorage}~\cite{vscode-storage}, ficheros involucrados, tipo de análisis, estado y configuración.
+
   \item \textbf{Obtención de ficheros.} Motor determina ficheros necesarios: plantillas HTML/CSS/JS para vista y argumentos para \texttt{main.py} que genera \texttt{data.json} con métricas. Se prepara paquete completo en \texttt{workspaceStorage}.
   
   \item \textbf{Persistencia temporal.} Paquete se guarda en ruta de sesión facilitando re-análisis y arranque del servidor. Ficheros se eliminan al cerrar VS Code evitando \emph{analysis zombies}.
@@ -1415,9 +1373,9 @@ Secuencia básica que sigue un análisis en Code‑XR desde la petición del usu
 % Diagrama vertical en TikZ
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-  node distance=6mm,
-  procstep/.style={rectangle, draw=black, rounded corners, fill=gray!10, text width=9cm, align=center, minimum height=8mm, font=\small},
+\begin{tikzpicture}[scale=0.8,
+  node distance=5mm,
+  procstep/.style={rectangle, draw=black, rounded corners, fill=gray!10, text width=7cm, align=center, minimum height=6mm, font=\footnotesize},
   arr/.style={-{Stealth}, thick, color=blue!60}
 ]
 \node[procstep] (p1) {1. Petición del análisis};
@@ -1462,7 +1420,7 @@ La comunicación utiliza procesos hijo (\texttt{child\_process}) y protocolo JSO
 \texttt{VenvManager} gestiona automáticamente entornos virtuales Python, detectando instalaciones, creando entornos aislados, instalando dependencias (Lizard) y manteniendo persistencia entre sesiones.
 
 \paragraph{Lenguajes de programación soportados}
-El motor de análisis utiliza la biblioteca Lizard\cite{lizard} como analizador principal, proporcionando soporte nativo para una amplia gama de lenguajes de programación modernos:
+El motor de análisis utiliza la biblioteca Lizard~\cite{lizard} como analizador principal, proporcionando soporte nativo para una amplia gama de lenguajes de programación modernos:
 
 \begin{itemize}
   \item \textbf{Lenguajes web}: JavaScript, TypeScript, PHP, Vue
@@ -1495,6 +1453,7 @@ Las métricas disponibles para visualización dependen del alcance del análisis
 \begin{itemize}
   \item \textbf{Modo XR}: Permite selección específica de métricas a representar mediante interfaz de mapeo de dimensiones, ofreciendo control granular sobre qué datos visualizar y cómo mapearlos a propiedades visuales (altura, tamaño, color, posición).
   \item \textbf{Modo LivePanel}: Representa automáticamente todas las métricas disponibles en formato tabular integrado, sin posibilidad de selección específica de datos.
+  \item \textbf{Modo DOM}: Visualiza la estructura jerárquica del DOM, no es posible configurar que metricas visualizar.
 \end{itemize}
 
 % TODO: Añadir figura con dos capturas de métricas disponibles para análisis XR
@@ -1747,38 +1706,7 @@ Mecanismo robusto de propagación desde detección hasta actualización visual:
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-  node distance=1.3cm and 2cm,
-  event/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=3cm, minimum height=0.8cm, align=center},
-  process/.style={rectangle, draw, fill=green!10, minimum width=3cm, minimum height=0.8cm, align=center},
-  decision/.style={diamond, draw, fill=yellow!10, minimum width=2cm, minimum height=0.8cm, align=center, inner sep=0pt},
-  flow/.style={thick,-latex}
-]
-
-% Nodes
-\node[event] (change) {Cambio en archivo};
-\node[process, right=of change] (debounce) {Aplicar debounce};
-\node[decision, right=of debounce] (nochanges) {¿Más cambios?};
-\node[process, below=of nochanges] (analyze) {Re-analizar archivo};
-\node[process, below=of analyze] (update) {Actualizar data.json};
-\node[process, below=of update] (emit) {Emitir evento SSE};
-\node[process, left=of emit] (receive) {Cliente recibe evento};
-\node[process, left=of receive] (request) {Solicitar datos};
-\node[process, above=of request] (render) {Actualizar visualización};
-
-% Connections
-\draw[flow] (change) -- (debounce);
-\draw[flow] (debounce) -- (nochanges);
-\draw[flow] (nochanges) -- node[right] {No} (analyze);
-\draw[flow] (nochanges) -- node[above] {Sí} ++(-1.5,0) -- ++(0,1.5) -- (debounce);
-\draw[flow] (analyze) -- (update);
-\draw[flow] (update) -- (emit);
-\draw[flow] (emit) -- (receive);
-\draw[flow] (receive) -- (request);
-\draw[flow] (request) -- (render);
-\draw[flow] (render) -- ++(-1.5,0) -- ++(0,3.0) -- (change);
-
-\end{tikzpicture}
+\includegraphics[width=0.45\linewidth]{img/ciclo-reanalisis-tiempo-real.png}
 \caption{Diagrama del ciclo de re-análisis y actualización en tiempo real.}
 \label{fig:reanalisis-ciclo}
 \end{figure}
@@ -1942,7 +1870,7 @@ La configuración inicial incorpora valores optimizados basados en análisis de 
 % Nombre sugerido: img/panel-configuracion-completo.png
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{img/panel-configuracion-completo.png}
+\includegraphics[width=0.45\textwidth]{img/panel-configuracion-completo.png}
 \caption{Panel de configuración completo de Code-XR mostrando todas las opciones de personalización: selección de análisis, tema visual, gráficos XR, mapeo de dimensiones, parámetros de ejecución y ordenación.}
 \label{fig:panel-configuracion-completo}
 \end{figure}
@@ -1993,20 +1921,10 @@ Sección \texttt{Active Analyses} para monitoreo y control de sesiones en ejecuc
 
 Estructura de perfil encapsulando configuración completa:
 
-\begin{figure}[H]
-\centering
-\begin{lstlisting}[
-language=JSON,
-basicstyle=\tiny\ttfamily,
-frame=single,
-breaklines=true,
-keywordstyle=\color{red},
-stringstyle=\color{blue},
-numberstyle=\color{green},
-commentstyle=\color{gray},
-xleftmargin=0.05cm,
-xrightmargin=0.05cm,
-showstringspaces=false]
+\begin{minipage}{0.9\linewidth}
+\begin{lstlisting}[language=json,
+caption={Estructura de un perfil de análisis en Code-XR mostrando el perfil por defecto con todas las configuraciones del sistema.},
+label={lst:profile-structure}]
 {
   "metadata": {
     "version": "1.0.0",
@@ -2041,9 +1959,7 @@ showstringspaces=false]
   }
 }
 \end{lstlisting}
-\caption{Estructura de un perfil de análisis en Code-XR mostrando el perfil por defecto con todas las configuraciones del sistema.}
-\label{fig:profile-structure}
-\end{figure}
+\end{minipage}
 
 \paragraph{Navegación de proyectos integrada}
 Interfaces especializadas para lanzamiento directo de análisis:
@@ -2082,7 +1998,7 @@ Sistema de plugins facilitando adición de componentes sin modificar núcleo:
 
 La documentación técnica presentada a lo largo de este documento (Primeros pasos, Sprint 1, Sprint 2 y Sprint 3) constituye una síntesis significativa de la implementación completa de Code-XR. Debido a las limitaciones de espacio inherentes a una memoria de TFG, se ha condensado considerablemente la información técnica para destacar únicamente los aspectos arquitectónicos y funcionales más relevantes del sistema.
 
-Para una comprensión completa y exhaustiva de todos los aspectos técnicos de la implementación, se recomienda encarecidamente consultar el repositorio público del proyecto: \url{https://github.com/aMonteSl/CodeXR}\cite{code-xr}
+Para una comprensión completa y exhaustiva de todos los aspectos técnicos de la implementación, se recomienda encarecidamente consultar el repositorio público del proyecto: \url{https://github.com/aMonteSl/CodeXR}~\cite{code-xr}
 
 Todo el código fuente está disponible bajo licencia MIT, incluyendo documentación técnica completa, guías de desarrollo, ejemplos prácticos y recursos para facilitar la comprensión, extensión y contribución al proyecto por parte de desarrolladores e investigadores interesados.
 
@@ -2158,7 +2074,7 @@ El procedimiento para conectarse al servidor desde las gafas es sencillo: el plu
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{img/ip-connection-info.png}
+\includegraphics[width=0.45\textwidth]{img/ip-connection-info.png}
 \caption{Información proporcionada por el plugin sobre la dirección IP para la conexión desde dispositivos externos.}
 \label{fig:ip-connection-info}
 \end{figure}
@@ -2224,11 +2140,11 @@ Para demostrar que Code-XR no es solo un concepto académico sino una herramient
 \hline
 \textbf{Proyecto} & \textbf{Archivos} & \textbf{Descripción} \\
 \hline
-BabiaXR \cite{moreno2022babiaxr} & 77 & Framework para visualización de datos en XR \\
+BabiaXR~\cite{moreno2022babiaxr} & 77 & Framework para visualización de datos en XR \\
 \hline
-Express.js \cite{expressjs2022web} & 142 & Framework web minimalista para Node.js \\
+Express.js~\cite{expressjs2022web} & 142 & Framework web minimalista para Node.js \\
 \hline
-JetUML \cite{jetuml2022web} & 338 & Herramienta ligera para diagramas UML \\
+JetUML~\cite{jetuml2022web} & 338 & Herramienta ligera para diagramas UML \\
 \hline
 \end{tabular}
 \caption{Proyectos utilizados para validar Code-XR}
@@ -2278,12 +2194,12 @@ Todos estos videos están disponibles en la galería de la página web. Se recom
   \item \textbf{Experiencia programar con Code-XR en AR}: \url{https://youtu.be/d7fojpP90Dk}
 \end{enumerate}
 
-El software es libre y de código abierto, disponible bajo licencia MIT en el repositorio oficial: \url{https://github.com/aMonteSl/CodeXR}\cite{code-xr}.
+El software es libre y de código abierto, disponible bajo licencia MIT en el repositorio oficial: \url{https://github.com/aMonteSl/CodeXR}~\cite{code-xr}.
 
 \section{VISSOFT/ICSME 2025}
 \label{sec:vissoft-icsme}
 
-El proyecto Code-XR fue aceptado y presentado el 7 de septiembre de 2025 en la conferencia internacional VISSOFT/ICSME 2025  (IEEE Working Conference on Software Visualization / International Conference on Software Maintenance and Evolution) \cite{vissoft2025} en la categoría de poster track.
+El proyecto Code-XR fue aceptado y presentado el 7 de septiembre de 2025 en la conferencia internacional VISSOFT/ICSME 2025  (IEEE Working Conference on Software Visualization / International Conference on Software Maintenance and Evolution)~\cite{vissoft2025} en la categoría de poster track.
 
 La versión presentada (0.0.8) era ligeramente anterior a la versión actual (1.0.0) y contenía las funcionalidades de análisis de ficheros individuales y visualización del DOM, pero aún no incluía el análisis de directorios completos que se ha incorporado posteriormente.
 
